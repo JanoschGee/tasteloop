@@ -7,6 +7,7 @@
   <meta name="description" content="Tasteloop collects your team's taste, every reference and every why, and makes it readable for Claude and your agents. Free and open source.">
   <meta name="theme-color" content="#FAF8F3">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/caveat-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <meta property="og:title" content="Tasteloop · Taste can't be prompted.">
@@ -16,11 +17,26 @@
   {{ANALYTICS}}
 </head>
 <body>
+  <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="rough" x="-3%" y="-3%" width="106%" height="106%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="4" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.6 2.05" result="g"/>
+        <feComposite in="d" in2="g" operator="in"/>
+      </filter>
+      <filter id="marker" x="-4%" y="-4%" width="108%" height="108%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="2" seed="9" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+  </svg>
   <a class="skip" href="#main">Skip to content</a>
   <header class="top">
     <a href="/" class="brand" aria-label="Tasteloop home">{{LOGO}}</a>
     <nav aria-label="Main">
       <a href="#how">How it works</a>
+      <a href="#team">For teams</a>
       <a href="#get">Get it</a>
       <a href="{{REPO_URL}}" class="nav-cta">GitHub</a>
     </nav>
@@ -28,65 +44,317 @@
 
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
-      <h1 id="hero-title">Taste can't be <span class="circled">prompted.{{CIRCLE:hero:240:90}}</span></h1>
-      <p class="lede">AI gets you 80% there. Your team knows the rest.</p>
-      <p class="what">Tasteloop collects your team's taste (every reference, every “why”) and makes it readable for Claude and your agents.</p>
-      <p class="cta-row"><a class="button" href="#get">Get it free</a> <span class="note">why: <em>because the last 20% is yours.</em></span></p>
+      <div class="hero-copy">
+        <h1 id="hero-title">Taste can't be <span class="circled">prompted.{{CIRCLE:hero:420:150}}</span></h1>
+        <p class="lede">AI gets you 80% there. Your team knows the rest.</p>
+        <p class="what">Tasteloop collects your team's taste (every reference, every “why”) and makes it readable for Claude and your agents.</p>
+        <p class="cta-row">
+          <a class="button" href="#get">Get it free{{CIRCLE:cta-hero:190:70}}</a>
+          <span class="note hero-note">why: <em>because the last 20% is yours.</em></span>
+        </p>
+        <p class="hero-meta">Free · open source (MIT) · runs on your own machine</p>
+      </div>
+
+      <figure class="board" tabindex="0">
+        <div class="board-sheet">
+          <picture>
+            <source media="(max-width: 600px)" srcset="/img/hero-desk-760.webp">
+            <img src="/img/hero-desk.webp" width="1400" height="1050" alt="A desk seen from above: printed reference photos of a chair in window light, a single tree, a ceramic cup and a red colour swatch, taped to a sheet of paper next to a red pencil." fetchpriority="high">
+          </picture>
+          <span class="mark mark-chair">{{CIRCLE:board-chair:300:330}}</span>
+          <span class="note mark-note-why">why: the light<br><small>Alex</small></span>
+          <svg class="arrow mark-arrow-why" viewBox="0 0 90 70" aria-hidden="true" focusable="false"><g filter="url(#rough)"><path class="bb" d="M-8 -8H98V78H-8Z"/><path pathLength="1" d="M84 52C60 60 30 44 16 10"/><path pathLength="1" d="M8 30C10 22 13 15 16 9C22 13 29 16 37 17"/></g></svg>
+          <span class="mark mark-tree">{{CIRCLE:board-tree:330:260:blue}}</span>
+          <span class="note note--blue mark-note-more">more of this <small>Kim</small></span>
+        </div>
+        <figcaption class="sr-only">Alex circled the chair print and wrote “why: the light” next to it. Kim circled the tree: “more of this”.</figcaption>
+      </figure>
     </section>
 
-    <section id="how" class="how" aria-labelledby="how-title">
-      <h2 id="how-title">How it works</h2>
-      <ol class="steps">
-        <li>
-          <h3><span class="circled">Circle it.{{CIRCLE:step1:150:70}}</span></h3>
-          <p>Drop a screenshot into your team chat. An ad, a photo, a colour, a line of copy.</p>
+    <section class="hook" aria-labelledby="hook-title">
+      <div class="hook-grid anim">
+        <header class="hook-head">
+          <p class="kicker">The problem</p>
+          <h2 id="hook-title">An AI made this ad in seconds.</h2>
+          <p class="section-lede">It's fine. It's also what everyone else gets. Then your team looks at it.</p>
+        </header>
+        <figure class="ad ad-before">
+          <div class="ad-frame">
+            <img src="/img/ad-before.webp" width="640" height="800" alt="A glossy, generic coffee advert: a perfect cup floating in a coffee splash in front of a purple and orange background." loading="lazy">
+            <p class="ad-line">Awaken your senses.</p>
+            <span class="mark m-ad d2">{{CIRCLE:ad:300:300}}</span>
+            <span class="note ad-note write d3">seen it a hundred times.</span>
+          </div>
+          <figcaption><b>Before.</b> Made by an AI, in seconds.</figcaption>
+        </figure>
+        <div class="voices">
+          <p class="voices-h">What your team says</p>
+          <p class="voice pop d3"><i class="av av--green" aria-hidden="true">K</i><span class="by">Kim</span><span class="note note--green write d3">too glossy. our light comes from a window.</span></p>
+          <p class="voice pop d4"><i class="av av--blue" aria-hidden="true">A</i><span class="by">Alex</span><span class="note note--blue write d4">nothing floats. nothing staged.</span></p>
+          <p class="voice pop d5"><i class="av av--graphite" aria-hidden="true">S</i><span class="by">Sam</span><span class="note note--graphite write d5">quieter. one line is enough.</span></p>
+          <p class="tally pop d7"><span class="avs"><i class="av av--green">K</i><i class="av av--blue">A</i><i class="av av--graphite">S</i></span><span class="underlined">3 people agree{{UNDERLINE:hooktally:200}}</span></p>
+          <p class="voices-note pop d8">Tasteloop keeps the photo and the reason. Next time, the AI knows.</p>
+        </div>
+        <figure class="ad ad-after pop d8">
+          <div class="ad-frame">
+            <img src="/img/ad-after.webp" width="640" height="800" alt="The same advert with the team's taste: a handmade cup of coffee on a wooden table in morning window light with long shadows." loading="lazy">
+            <p class="ad-line">Morning light, nothing staged.</p>
+            <span class="stamp stamp-in d9">No slop</span>
+          </div>
+          <figcaption><b>After.</b> Same AI, with your team's taste. <small>Illustration.</small></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="how" class="flow" aria-labelledby="how-title">
+      <header class="section-head">
+        <p class="kicker">How it works</p>
+        <h2 id="how-title">From your team chat to your <span class="circled anim">agents.{{CIRCLE:flowtitle:260:100}}</span></h2>
+        <ol class="plain">
+          <li>Drop a photo into the team chat.</li>
+          <li>Say why it matters.</li>
+          <li>Anyone on the team can add to it.</li>
+        </ol>
+        <p class="section-lede">Tasteloop turns that into a brand guide your agents read. Four steps, one loop.</p>
+      </header>
+
+      <nav class="rail" aria-label="The four steps">
+        <ol>
+          <li><a href="#step-messenger"><span class="rail-n">01</span> Messenger{{CIRCLE:rail1:150:52}}</a></li>
+          <li><a href="#step-classification"><span class="rail-n">02</span> Classification{{CIRCLE:rail2:170:52}}</a></li>
+          <li><a href="#step-memory"><span class="rail-n">03</span> Brand memory{{CIRCLE:rail3:170:52}}</a></li>
+          <li><a href="#step-agents"><span class="rail-n">04</span> Agents{{CIRCLE:rail4:130:52}}</a></li>
+        </ol>
+      </nav>
+
+      <ol class="flow-steps">
+        <li id="step-messenger" class="step">
+          <div class="step-text">
+            <p class="step-n">01 · Messenger</p>
+            <h3>Drop a photo into the team chat.</h3>
+            <p>A screenshot, an ad, a colour, a line of copy. Anything you'd show a colleague and say “this”. It works in Telegram today.</p>
+            <h3>Say why it matters.</h3>
+            <p>Add a caption or a voice note, then tap one of three buttons: <strong>Brand</strong>, <strong>Campaign</strong> or <strong>Just keep</strong>. Anyone on the team can add to it.</p>
+          </div>
+          <div class="stage anim">
+            <div class="phone" role="img" aria-label="A team chat on a phone. Kim sends a photo of a chair in window light and a 27 second voice note. Tasteloop asks where it goes, with the buttons Brand, Campaign and Just keep. Brand is circled.">
+              <div class="phone-bar"><span class="phone-title">Brand taste</span><span class="phone-sub">Alex, Kim, Sam</span></div>
+              <div class="chat">
+                <div class="msg msg-photo pop d1">
+                  <span class="who"><i class="av av--green" aria-hidden="true">K</i>Kim</span>
+                  <img src="/img/ref-chair.webp" width="720" height="720" alt="" loading="lazy">
+                </div>
+                <div class="msg msg-voice pop d2">
+                  <svg class="play" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2.5v11l9-5.5z"/></svg>
+                  {{WAVE:kim:26}}
+                  <span class="dur">0:27</span>
+                </div>
+                <p class="note note--green transcript write d3">“the light. not the model.”</p>
+                <div class="msg msg-bot pop d4">
+                  <span class="who"><i class="av av--ink" aria-hidden="true">t</i>Tasteloop</span>
+                  <span>Got it. Where does it go?</span>
+                  <span class="chips">
+                    <span class="chip chip-on">Brand{{CIRCLE:chip:90:44}}</span>
+                    <span class="chip">Campaign</span>
+                    <span class="chip">Just keep</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <span class="note stage-note write d6">one tap.<br>that's it.</span>
+            <svg class="arrow step-link" viewBox="0 0 60 100" aria-hidden="true" focusable="false"><g filter="url(#rough)"><path class="bb" d="M-8 -8H68V108H-8Z"/><path pathLength="1" d="M40 4C12 22 50 44 26 62C20 70 22 82 28 92"/><path pathLength="1" d="M14 78C19 84 24 89 29 94C33 87 38 81 45 77"/></g></svg>
+          </div>
         </li>
-        <li>
-          <h3>Say why.</h3>
-          <p>Add a voice note or a caption. <span class="note">why: the light, not the model.</span></p>
-          <p>It lands in a shared memory, with the image and the reason.</p>
+
+        <li id="step-classification" class="step">
+          <div class="step-text">
+            <p class="step-n">02 · Classification</p>
+            <h3>Claude reads the image and the why.</h3>
+            <p>The voice note is transcribed on your machine. Claude analyses the image together with your reason: what you like, what you don't, the style, how it fits the brand.</p>
+            <p>It lands as a plain Markdown note with the image in your Obsidian vault.</p>
+          </div>
+          <div class="stage anim">
+            <div class="classify" role="img" aria-label="The chair photo as a print. A red pencil circle marks the window light. Next to it a Markdown note with the properties level brand, by Kim, style natural light, long shadows, quiet, and the quoted why.">
+              <div class="print pop d1">
+                <span class="tape"></span>
+                <img src="/img/ref-chair.webp" width="720" height="720" alt="" loading="lazy">
+                <span class="mark mark-light">{{CIRCLE:light:220:200}}</span>
+                <span class="scan"></span>
+              </div>
+              <div class="md pop d3">
+                <p class="file">Uploads/chair-in-window-light.md</p>
+                <ul class="props">
+                  <li class="pop d4"><span>level</span><b>brand</b></li>
+                  <li class="pop d5"><span>by</span><b>Kim</b></li>
+                  <li class="pop d6"><span>style</span><b>natural light</b><b>long shadows</b><b>quiet</b></li>
+                </ul>
+                <p class="md-h pop d7">Why</p>
+                <p class="note note--green md-why write d7">the light. not the model.</p>
+                <p class="md-h pop d8">Analysis</p>
+                <p class="md-p pop d8">Likes: hard window light, an empty room. Fits the brand: calm, nothing staged.</p>
+              </div>
+            </div>
+            <svg class="arrow step-link" viewBox="0 0 60 100" aria-hidden="true" focusable="false"><g filter="url(#rough)"><path class="bb" d="M-8 -8H68V108H-8Z"/><path pathLength="1" d="M40 4C12 22 50 44 26 62C20 70 22 82 28 92"/><path pathLength="1" d="M14 78C19 84 24 89 29 94C33 87 38 81 45 77"/></g></svg>
+          </div>
         </li>
-        <li>
-          <h3>Your agents get it.</h3>
-          <p>Every week, Tasteloop proposes rules for your brand guide. Approved rules become files your agents read, with the references as proof.</p>
+
+        <li id="step-memory" class="step">
+          <div class="step-text">
+            <p class="step-n">03 · Brand memory</p>
+            <h3>The guide learns. The core stays locked.</h3>
+            <p>Every week, Tasteloop proposes changes to your brand guide, with the evidence images and who backs it. Disagreements show up next to it.</p>
+            <p>A person approves. Only then is it written, and only into the part that may learn. Campaign uploads become a brief right away.</p>
+          </div>
+          <div class="stage anim">
+            <div class="memory" role="img" aria-label="The brand guide as a document. Part 1, Core, is locked. Part 2, Expression, learns. A proposal slip says: prefer natural window light, support 3 people, 5 references, Alex, Kim, Sam. It carries a red stamp: approved.">
+              <div class="guide pop d1">
+                <p class="file">Brand/Brand Guide.md</p>
+                <div class="g-part g-core">
+                  <p class="g-h">1. Core <span class="lock"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2"/><path class="lock-body" d="M3 7h10v7H3z"/></svg>locked</span></p>
+                  <p class="g-line">Purpose, audience, what we never do.</p>
+                  <p class="g-line g-muted">People only. No job ever writes here.</p>
+                </div>
+                <div class="g-part g-expr">
+                  <p class="g-h">2. Expression <span class="learn">learns</span></p>
+                  <p class="g-line">2.3 Imagery</p>
+                  <p class="g-line g-new pop d8"><span>+ Natural window light. Nothing staged.</span>{{UNDERLINE:gnew:300}}</p>
+                </div>
+              </div>
+              <div class="proposal pop d2">
+                <span class="tape"></span>
+                <p class="p-k">Proposal · 2.3 Imagery</p>
+                <p class="p-t">Prefer natural window light</p>
+                <p class="p-ev">
+                  <img class="pop d3" src="/img/ref-chair.webp" width="720" height="720" alt="" loading="lazy">
+                  <img class="pop d3" src="/img/ref-tree.webp" width="720" height="720" alt="" loading="lazy">
+                  <img class="pop d4 ev-crop" src="/img/ref-chair.webp" width="720" height="720" alt="" loading="lazy">
+                  <img class="pop d4 ev-crop" src="/img/ref-tree.webp" width="720" height="720" alt="" loading="lazy">
+                  <img class="pop d4" src="/img/ref-poster.webp" width="720" height="720" alt="" loading="lazy">
+                </p>
+                <p class="p-s pop d5"><span class="avs"><i class="av av--blue">A</i><i class="av av--green">K</i><i class="av av--graphite">S</i></span><b>3 people, 5 references</b> <span class="p-names">Alex, Kim, Sam</span></p>
+                <span class="stamp stamp-in d7">Approved</span>
+              </div>
+            </div>
+            <svg class="arrow step-link" viewBox="0 0 60 100" aria-hidden="true" focusable="false"><g filter="url(#rough)"><path class="bb" d="M-8 -8H68V108H-8Z"/><path pathLength="1" d="M40 4C12 22 50 44 26 62C20 70 22 82 28 92"/><path pathLength="1" d="M14 78C19 84 24 89 29 94C33 87 38 81 45 77"/></g></svg>
+          </div>
+        </li>
+
+        <li id="step-agents" class="step">
+          <div class="step-text">
+            <p class="step-n">04 · Agents</p>
+            <h3>Your agents get it.</h3>
+            <p>No API, no plugin. Claude and other agents read plain files: the guide, the references, the briefs. The proof is right there, as images, with the reasons.</p>
+            <p>The next photo your team drops in starts the loop again.</p>
+          </div>
+          <div class="stage anim">
+            <div class="agent" role="img" aria-label="An agent session. Asked for a headline for the spring campaign, the agent reads the brand guide, the spring brief and five references, then writes: Morning light, nothing staged. Image: window light, long shadows, an empty chair. A stamp says: no slop.">
+              <p class="agent-bar">agent · your project</p>
+              <p class="agent-you pop d1"><span>you</span> Write the headline for the spring campaign.</p>
+              <ul class="reads">
+                <li class="pop d2">Read <code>Brand/Brand Guide.md</code></li>
+                <li class="pop d3">Read <code>Briefs/Spring Brief.md</code></li>
+                <li class="pop d4">Read <code>Uploads/</code> <small>5 references</small></li>
+              </ul>
+              <div class="agent-out">
+                <p class="out-h type d5">Morning light, nothing staged.</p>
+                <p class="out-p type d6">Image: window light, long shadows, an empty chair.</p>
+                <p class="out-p type d7">No studio flash (guide 2.3).</p>
+              </div>
+              <span class="stamp stamp-in d8">No slop</span>
+              <span class="note note--blue agent-note write d9">sounds like us.</span>
+            </div>
+          </div>
         </li>
       </ol>
     </section>
 
-    <section class="team" aria-labelledby="team-title">
-      <h2 id="team-title">Built for teams, not for one person's taste</h2>
+    <section id="team" class="team" aria-labelledby="team-title">
+      <header class="section-head">
+        <p class="kicker">For teams</p>
+        <h2 id="team-title">Built for teams, not for one person's taste</h2>
+        <p class="section-lede">Anyone on the team can add a reference or a reason. You see who backs a rule, and who doesn't.</p>
+      </header>
+
+      <div class="wall anim">
+        <figure class="ref ref-agree">
+          <span class="tape"></span>
+          <div class="ref-img">
+            <img src="/img/ref-tree.webp" width="720" height="720" alt="Black and white photo of a single tree on a grassy hill, circled by three people: Alex, Kim and Sam." loading="lazy">
+            <span class="mark m-a d1">{{CIRCLE:agree-a:300:290:blue}}</span>
+            <span class="mark m-b d3">{{CIRCLE:agree-b:330:300:green}}</span>
+            <span class="mark m-c d5">{{CIRCLE:agree-c:290:320:graphite}}</span>
+          </div>
+          <p class="voice n-a pop d2"><i class="av av--blue" aria-hidden="true">A</i><span class="by">Alex</span><span class="note note--blue write d2">the calm.</span></p>
+          <p class="voice n-b pop d4"><i class="av av--green" aria-hidden="true">K</i><span class="by">Kim</span><span class="note note--green write d4">more of this.</span></p>
+          <p class="voice n-c pop d6"><i class="av av--graphite" aria-hidden="true">S</i><span class="by">Sam</span><span class="note note--graphite write d6">all that empty sky.</span></p>
+          <figcaption class="tally pop d7"><span class="underlined">3 people agree{{UNDERLINE:tally:220}}</span></figcaption>
+        </figure>
+
+        <figure class="ref ref-dispute">
+          <span class="tape"></span>
+          <div class="ref-img">
+            <img src="/img/ref-poster.webp" width="720" height="720" alt="A wheat-pasted poster on a concrete wall that reads “Taste can't be prompted.”, circled by Alex." loading="lazy">
+            <span class="mark m-d d2">{{CIRCLE:dispute-a:330:300:blue}}</span>
+          </div>
+          <p class="voice n-d pop d3"><i class="av av--blue" aria-hidden="true">A</i><span class="by">Alex</span><span class="note note--blue write d3">love the type.</span></p>
+          <p class="voice n-e pop d5"><i class="av av--green" aria-hidden="true">K</i><span class="by">Kim <b class="dis">disagrees</b></span><span class="note note--green write d5">too loud for us.</span></p>
+          <figcaption class="disputed pop d7">Disputed. Waits for a person.</figcaption>
+        </figure>
+      </div>
+
       <ul class="pillars">
-        <li><h3>Everyone adds.</h3><p>Each contributor gets their own pen. You see who backs a rule: “3 people, 5 references”.</p></li>
-        <li><h3>Disagreements surface.</h3><p>If one person loves what another dislikes, Tasteloop shows both sides. Nothing contested quietly becomes a rule.</p></li>
-        <li><h3>Humans approve.</h3><p>Agents suggest. People decide. The core of your brand is locked and never changes on its own.</p></li>
+        <li class="card"><h3>Everyone adds.</h3><p>Every note carries a name. You see who backs a rule: “3 people, 5 references”.</p></li>
+        <li class="card"><h3>Disagreements surface.</h3><p>If one person loves what another dislikes, Tasteloop shows both sides. Nothing contested quietly becomes a rule.</p></li>
+        <li class="card"><h3>Humans approve.</h3><p>Agents suggest. People decide. The core of your brand is locked and never changes on its own.</p></li>
       </ul>
     </section>
 
+    <section class="loud" aria-labelledby="loud-title">
+      <div class="loud-in anim">
+        <div class="loud-copy">
+          <h2 id="loud-title">Stop the <span class="circled">slop.{{CIRCLE:slop:360:170:marker}}</span></h2>
+          <p class="strip strip-1 pop d2">Taste can't be prompted.</p>
+          <p class="strip strip-2 pop d3">Your team knows the rest.</p>
+          <p class="loud-p">We like AI. It gets you 80% there, fast. The last 20% is why people notice you, and it lives in your team's heads. Tasteloop writes it down.</p>
+        </div>
+        <figure class="loud-fig">
+          <img src="/img/loud-tote.webp" width="720" height="720" alt="A black canvas tote bag on a yellow background, printed with the words NO SLOP in big yellow letters." loading="lazy">
+          <span class="mark m-tote">{{CIRCLE:tote:330:330:marker}}</span>
+        </figure>
+      </div>
+    </section>
+
     <section class="promise" aria-labelledby="promise-title">
-      <h2 id="promise-title">Our promise</h2>
+      <header class="section-head">
+        <p class="kicker">Our promise</p>
+        <h2 id="promise-title">Yours, on your machine</h2>
+      </header>
       <ul class="promises">
-        <li><strong>Your taste stays yours.</strong> Plain Markdown and images in your own Obsidian vault. No lock-in, nothing to export.</li>
-        <li><strong>Runs on your machine.</strong> Your laptop, a Mac mini or a small server. Only the AI calls leave it.</li>
-        <li><strong>Made for the last 20%.</strong> We like AI. We just think taste is a team sport. <mark class="loud">No slop.</mark></li>
+        <li class="card"><h3>Your taste stays yours.</h3><p>Plain Markdown and images in your own Obsidian vault. No lock-in, nothing to export.</p></li>
+        <li class="card"><h3>Runs on your machine.</h3><p>Your laptop, a Mac mini or a small server. Only the AI calls leave it.</p></li>
+        <li class="card"><h3>Made for the last 20%.</h3><p>We like AI. We just think taste is a team sport. <strong class="noslop">No slop.</strong></p></li>
       </ul>
     </section>
 
     <section id="get" class="get" aria-labelledby="get-title">
-      <h2 id="get-title">Get it free</h2>
-      <p>Tasteloop is free and open source (MIT). Set it up yourself in about an hour, guided by Claude Code.</p>
-      <ol class="get-steps">
-        <li><a class="button" href="{{REPO_URL}}">Get it on GitHub</a></li>
-        <li>
-          <p class="prompt-label" id="prompt-label">Set it up with Claude Code in one prompt:</p>
-          <div class="prompt">
-            <code id="setup-prompt">Clone {{REPO_URL}} and set up tasteloop</code>
-            <button type="button" class="copy" data-copy="setup-prompt" aria-describedby="prompt-label" hidden>Copy</button>
-          </div>
-          <p class="small-note">Claude Code walks you through it step by step. You create the bot and the keys yourself; secrets never go into the chat.</p>
-        </li>
-      </ol>
-      <p class="later">Hosted version for teams: later.</p>
-      <p id="copy-status" class="sr-status" role="status" aria-live="polite"></p>
+      <div class="get-sheet anim">
+        <span class="tape"></span>
+        <h2 id="get-title"><span class="circled">Get it free{{CIRCLE:get:330:100}}</span></h2>
+        <p class="get-lede">Tasteloop is free and open source (MIT). Set it up yourself in about an hour, guided by Claude Code.</p>
+        <ol class="get-steps">
+          <li><a class="button" href="{{REPO_URL}}">Get it on GitHub{{CIRCLE:cta-get:230:70}}</a></li>
+          <li>
+            <p class="prompt-label" id="prompt-label">Set it up with Claude Code in one prompt:</p>
+            <div class="prompt">
+              <code id="setup-prompt">Clone {{REPO_URL}} and set up tasteloop</code>
+              <button type="button" class="copy" data-copy="setup-prompt" aria-describedby="prompt-label" hidden>Copy</button>
+            </div>
+            <p class="small-note">Claude Code walks you through it step by step. You create the bot and the keys yourself; secrets never go into the chat.</p>
+          </li>
+        </ol>
+        <p class="later">Hosted version for teams: later.</p>
+        <p id="copy-status" class="sr-status" role="status" aria-live="polite"></p>
+      </div>
     </section>
   </main>
 

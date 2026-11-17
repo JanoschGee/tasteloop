@@ -1,5 +1,5 @@
 /** Gebaute Seite: Inhalt, Barrierearmut, keine Formulare, keine fremden Ressourcen, Vercel-Header, Analytics nur auf Wunsch, Entwurfsschutz. */
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { analyticsTag, build, liveRequested, REPO_URL } from "../build";
@@ -21,9 +21,14 @@ describe("Inhalt", () => {
       "Taste can't be",
       "AI gets you 80% there. Your team knows the rest.",
       "Tasteloop collects your team's taste (every reference, every “why”) and makes it readable for Claude and your agents.",
-      "Circle it.",
-      "Say why.",
+      "An AI made this ad in seconds.",
+      "Drop a photo into the team chat.",
+      "Say why it matters.",
+      "Anyone on the team can add to it.",
       "Your agents get it.",
+      "3 people agree",
+      "3 people, 5 references",
+      "Stop the",
       "Everyone adds.",
       "Disagreements surface.",
       "Humans approve.",
@@ -45,6 +50,30 @@ describe("Inhalt", () => {
     expect(html).toMatch(/<svg[^>]*aria-hidden="true"[^>]*>[\s\S]*?taste<tspan>loop<\/tspan>/);
     expect((html.match(/class="circle"/g) ?? []).length).toBeGreaterThanOrEqual(2);
     expect(html).not.toMatch(/<ellipse|<circle |Gradient/);
+    expect(read("styles.css")).not.toMatch(/gradient\(/i);
+  });
+  it("erklärt den Ablauf in vier Schritten: Messenger, Classification, Brand memory, Agents", () => {
+    const rail = /<nav class="rail"[\s\S]*?<\/nav>/.exec(html)?.[0] ?? "";
+    expect(rail.replace(/<svg[\s\S]*?<\/svg>|<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("01 Messenger 02 Classification 03 Brand memory 04 Agents");
+    for (const id of ["step-messenger", "step-classification", "step-memory", "step-agents"]) {
+      expect(html, id).toContain(`id="${id}"`);
+      expect(html, id).toContain(`href="#${id}"`);
+    }
+    for (const s of [">Brand<", ">Campaign<", ">Just keep<", "locked", "learns", "Approved", "Brand/Brand Guide.md"]) expect(html, s).toContain(s);
+  });
+  it("mehrere Beitragende sind mit Namen sichtbar, nicht nur über Stiftfarben", () => {
+    for (const n of ["Alex", "Kim", "Sam"]) expect(html).toMatch(new RegExp(`class="by">${n}`));
+    expect(html).toContain("disagrees");
+  });
+  it("behauptet keine Kunden, Zahlen oder eine gehostete Version", () => {
+    expect(html).not.toMatch(/trusted by|customers|testimonial|\d+\s?(x|%) (faster|better|more)|sign up|pricing/i);
+  });
+  it("Gelb gibt es nur in der einen lauten Sektion", () => {
+    expect((html.match(/class="loud"/g) ?? []).length).toBe(1);
+    const css = read("styles.css");
+    const uses = css.split("\n").filter((l) => /var\(--marker\)|#ffe500/i.test(l) && !/^\s*--marker:/.test(l));
+    expect(uses.length).toBeGreaterThan(0);
+    for (const l of uses) expect(l, l).toMatch(/\.loud/);
   });
 });
 
@@ -54,6 +83,61 @@ describe("Keine personenbezogenen Daten, kein Cloudflare mehr", () => {
     expect(all).not.toMatch(/<form|<input|<select|<textarea|waitlist|\/api\//i);
     for (const f of ["functions", "wrangler.toml", "migrations"]) expect(existsSync(join(here, f)), f).toBe(false);
     expect(existsSync(join(dist, "_headers"))).toBe(false);
+  });
+});
+
+describe("Bilder, Bewegung und CSP", () => {
+  it("jedes Bild hat alt, Breite und Höhe, liegt lokal als WebP vor; unter dem Falz wird nachgeladen", () => {
+    const imgs = html.match(/<img\b[^>]*>/g) ?? [];
+    expect(imgs.length).toBeGreaterThanOrEqual(6);
+    for (const tag of imgs) {
+      expect(tag, tag).toMatch(/\salt="[^"]*"/);
+      expect(tag, tag).toMatch(/\swidth="\d+"/);
+      expect(tag, tag).toMatch(/\sheight="\d+"/);
+      const src = /\ssrc="(\/img\/[\w-]+\.webp)"/.exec(tag)?.[1];
+      expect(src, tag).toBeTruthy();
+      expect(existsSync(join(dist, src!)), src).toBe(true);
+      if (!tag.includes("hero-desk")) expect(tag, tag).toContain('loading="lazy"');
+    }
+    // inhaltliche Bilder (nicht in einer role="img"-Illustration) brauchen einen echten Alt-Text
+    expect(imgs.filter((t) => /\salt="[^"]{20,}"/.test(t)).length).toBeGreaterThanOrEqual(6);
+    expect(html).toMatch(/hero-desk\.webp"[^>]*fetchpriority="high"/);
+  });
+  it("Seitengewicht bleibt im Rahmen (Hero ≤ 200 kB, alles zusammen < 1,5 MB)", () => {
+    const size = (dir: string): number =>
+      readdirSync(dir).reduce((sum, f) => {
+        const p = join(dir, f);
+        return sum + (statSync(p).isDirectory() ? size(p) : statSync(p).size);
+      }, 0);
+    expect(statSync(join(dist, "img/hero-desk.webp")).size).toBeLessThanOrEqual(200_000);
+    expect(size(dist)).toBeLessThan(1_500_000);
+  });
+  it("CSP-tauglich: kein Inline-Skript, kein Inline-Stil, keine Event-Attribute", () => {
+    const all = readdirSync(dist).filter((f) => f.endsWith(".html")).map(read).join("\n");
+    expect(all).not.toMatch(/<style[\s>]/i);
+    expect(all).not.toMatch(/\sstyle\s*=/i);
+    expect(all).not.toMatch(/\son[a-z]+\s*=\s*["']/i);
+    for (const tag of all.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []) expect(tag, tag).toMatch(/^<script (defer )?src="\/[^"]+"( defer)?><\/script>$/);
+    const js = read("app.js");
+    expect(js).not.toMatch(/\beval\(|new Function|innerHTML|\.style\.|setAttribute\("style"|fetch\(|XMLHttpRequest|import\(/);
+  });
+  it("Bewegung: Stiftzüge sind zeichenbar, ohne Bewegung und ohne JavaScript bleibt alles lesbar", () => {
+    const css = read("styles.css");
+    expect(html).toMatch(/<path pathLength="1" d="M/);
+    expect(css).toContain("stroke-dashoffset");
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*animation: none !important;[\s\S]*transition: none !important;/);
+    // versteckte Startzustände nur unter .js und nur ohne reduzierte Bewegung
+    const [base, motion] = css.split("@media (prefers-reduced-motion: no-preference)");
+    expect(motion).toBeTruthy();
+    expect(base).not.toMatch(/\.(pop|write|type|stamp-in)[^{]*\{[^}]*(opacity: 0|clip-path)/);
+    expect(motion).toContain(".js .anim:not(.in) .pop");
+    expect(css).toMatch(/@supports \(animation-timeline: view\(\)\)/);
+    expect(read("app.js")).toContain("prefers-reduced-motion: reduce");
+    expect(read("app.js")).toContain("IntersectionObserver");
+  });
+  it("Schriften kommen von der eigenen Seite", () => {
+    for (const f of ["fonts/caveat-latin-400-normal.woff2", "fonts/inter-tight-latin-wght-normal.woff2", "fonts/inter-tight-LICENSE.txt"]) expect(existsSync(join(dist, f)), f).toBe(true);
+    expect(read("styles.css")).toMatch(/url\("\/fonts\/inter-tight-latin-wght-normal\.woff2"\)/);
   });
 });
 
@@ -69,7 +153,8 @@ describe("Barrierearm und schnell", () => {
   });
   it("lädt nichts von fremden Hosts und setzt keine Tracker (Standard)", () => {
     const all = ["index.html", "imprint.html", "privacy.html", "styles.css", "app.js"].map(read).join("\n");
-    expect(all).not.toMatch(/(src)="https?:\/\//);
+    expect(all).not.toMatch(/(src|srcset)="https?:\/\//);
+    expect(all).not.toMatch(/@import|\/\/[\w.-]+\.(com|net|org|io)\/[^"\s]*\.(js|css|woff2?)/);
     expect(all).not.toMatch(/url\(["']?https?:/);
     expect(all).not.toMatch(/_vercel\/insights|cloudflareinsights|googleapis|gstatic|google-analytics|gtag|googletagmanager|plausible|hotjar|segment|facebook|document\.cookie|localStorage/i);
     expect(existsSync(join(dist, "fonts/caveat-latin-400-normal.woff2"))).toBe(true);
