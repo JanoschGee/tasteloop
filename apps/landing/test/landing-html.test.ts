@@ -115,23 +115,23 @@ describe("Vercel Web Analytics (optional)", () => {
 });
 
 describe("Impressum, Datenschutz und Livegang", () => {
-  it("Impressum: englisch, mit Pflichtangaben und sichtbaren TODO", () => {
+  it("Impressum: englisch, mit Pflichtangaben und Kontakt-E-Mail", () => {
     const p = read("imprint.html");
     expect(p).toContain('<html lang="en">');
     for (const s of ["Information pursuant to § 5 DDG", " GmbH", "Goldenfelsstr. 9", "50935 Köln", "Managing Director", "HRB 105791", "DE343108788", "Responsible for content"]) expect(p, s).toContain(s);
-    expect(p).toContain('<mark class="todo">[TODO bestätigen]</mark>');
-    expect(p).toContain('<mark class="todo">[TODO]</mark>');
+    expect(p).toContain("Register court: Amtsgericht Köln");
+    expect(p).toMatch(/href="mailto:[^"]+@[^"]+"/);
     expect(p).not.toMatch(/disclaimer|haftung/i);
   });
-  it("Impressum und Datenschutz sind Entwürfe mit noindex", () => {
+  it("Impressum und Datenschutz sind final: kein Entwurf, kein TODO", () => {
     for (const f of ["imprint.html", "privacy.html"]) {
       const p = read(f);
-      expect(p).toContain("ENTWURF – NICHT LIVE SCHALTEN");
-      expect(p).toContain('<meta name="robots" content="noindex, nofollow">');
+      expect(p).not.toContain('data-draft="true"');
+      expect(p).not.toContain("[TODO");
     }
   });
-  it("der Live-Build bricht ab bei Entwürfen und offenen TODO", () => {
-    expect(() => build({ live: true })).toThrow(/draft pages/);
+  it("der Live-Build läuft mit den finalen Rechtstexten", () => {
+    expect(() => build({ live: true })).not.toThrow();
     expect(() => build({ repoUrl: "javascript:alert(1)" })).toThrow(/repo URL/);
   });
   it("auf Vercel gilt der Entwurfsschutz nur für die Produktion", () => {
