@@ -1,0 +1,5 @@
+#!/bin/sh
+# Verhindert, dass Secrets, Kundenmarken oder interne Namen eingecheckt werden.
+npx --no-install tsx scripts/check-secrets.ts || exit 1
+npx --no-install tsx scripts/check-neutral.ts || exit 1
+npx --no-install tsx scripts/check-public.ts || exit 1

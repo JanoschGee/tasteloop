@@ -1,0 +1,11 @@
+{
+  "update_id": 1002,
+  "message": {
+    "message_id": 11,
+    "date": 1762950030,
+    "chat": { "id": -1001234567890, "type": "supergroup" },
+    "from": { "id": 111, "first_name": "Anna" },
+    "voice": { "file_id": "voice-1", "duration": 12, "mime_type": "audio/ogg" },
+    "reply_to_message": { "message_id": 10, "date": 1762950000, "chat": { "id": -1001234567890, "type": "supergroup" } }
+  }
+}

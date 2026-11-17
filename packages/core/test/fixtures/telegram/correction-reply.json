@@ -1,0 +1,11 @@
+{
+  "update_id": 1004,
+  "message": {
+    "message_id": 12,
+    "date": 1762950090,
+    "chat": { "id": -1001234567890, "type": "supergroup" },
+    "from": { "id": 222, "first_name": "Ben" },
+    "text": "Mir gefällt eher das Licht als die Farbe",
+    "reply_to_message": { "message_id": 500, "date": 1762950001, "chat": { "id": -1001234567890, "type": "supergroup" } }
+  }
+}

@@ -1,0 +1,30 @@
+# Abhängigkeiten und Builds
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets: niemals einchecken (liegen nur auf dem Mac mini, außerhalb von Repo und Vault)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials*.json
+cloudflared/*.json
+
+# Laufzeitdaten
+.data/
+state.json
+*.log
+coverage/
+
+# macOS
+.DS_Store
+
+# Persönliche Marken-Configs gehören nach ~/.config/tasteloop/brands/, nicht ins Repo
+brands/*
+!brands/example.yaml

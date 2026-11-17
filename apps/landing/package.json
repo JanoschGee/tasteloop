@@ -1,0 +1,11 @@
+{
+  "name": "@tasteloop/landing",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsx build.ts",
+    "build:live": "tsx build.ts --live"
+  },
+  "license": "MIT"
+}

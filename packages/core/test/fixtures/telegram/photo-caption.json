@@ -1,0 +1,14 @@
+{
+  "update_id": 1001,
+  "message": {
+    "message_id": 10,
+    "date": 1762950000,
+    "chat": { "id": -1001234567890, "type": "supergroup", "title": "Brand Inbox" },
+    "from": { "id": 111, "first_name": "Anna" },
+    "caption": "Die Farbwelt hier ist genau unser Look, warm und analog",
+    "photo": [
+      { "file_id": "photo-small", "file_unique_id": "s", "width": 90, "height": 90 },
+      { "file_id": "photo-large", "file_unique_id": "l", "width": 1280, "height": 960 }
+    ]
+  }
+}

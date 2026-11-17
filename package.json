@@ -1,0 +1,38 @@
+{
+  "name": "tasteloop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Tasteloop: collect your team's taste (every reference, every why) and make it readable for Claude and your agents.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/core",
+    "apps/web"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p packages/core --noEmit && tsc -p apps/landing --noEmit",
+    "check:secrets": "tsx scripts/check-secrets.ts",
+    "check:neutral": "tsx scripts/check-neutral.ts",
+    "build:web": "npm run build -w apps/web",
+    "verify": "npm run check:secrets && npm run check:neutral && npm run check:public && npm run typecheck && npm test && npm run build:web && npm run build:landing",
+    "bot": "tsx packages/core/src/cli.ts bot",
+    "digest": "tsx packages/core/src/cli.ts digest",
+    "apply": "tsx packages/core/src/cli.ts apply",
+    "init-vault": "tsx packages/core/src/cli.ts init-vault",
+    "doctor": "tsx packages/core/src/cli.ts doctor",
+    "build:landing": "tsx apps/landing/build.ts",
+    "check:public": "tsx scripts/check-public.ts",
+    "ids": "tsx packages/core/src/cli.ts ids",
+    "sync-plan": "tsx packages/core/src/cli.ts sync-plan"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.0"
+  },
+  "license": "MIT"
+}

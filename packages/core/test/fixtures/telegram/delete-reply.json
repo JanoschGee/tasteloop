@@ -1,0 +1,11 @@
+{
+  "update_id": 1005,
+  "message": {
+    "message_id": 13,
+    "date": 1762950120,
+    "chat": { "id": -1001234567890, "type": "supergroup" },
+    "from": { "id": 111, "first_name": "Anna" },
+    "text": "/löschen",
+    "reply_to_message": { "message_id": 500, "date": 1762950001, "chat": { "id": -1001234567890, "type": "supergroup" } }
+  }
+}

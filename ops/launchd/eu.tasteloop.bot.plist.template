@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Vorlage. Wird von ops/install-macmini.sh nach /Library/LaunchDaemons gerendert. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>eu.tasteloop.__BRAND_ID__.bot</string>
+	<key>UserName</key>
+	<string>__USER__</string>
+	<key>GroupName</key>
+	<string>staff</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>HOME</key>
+		<string>__HOME__</string>
+		<key>PATH</key>
+		<string>__NODE_DIR__:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<key>TASTELOOP_BRAND_CONFIG</key>
+		<string>__HOME__/.config/tasteloop/brands/__BRAND_ID__.yaml</string>
+		<key>TASTELOOP_ENV_FILE</key>
+		<string>__HOME__/.config/tasteloop/.env</string>
+		<key>NODE_ENV</key>
+		<string>production</string>
+	</dict>
+	<key>WorkingDirectory</key>
+	<string>__REPO__</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>__NODE__</string>
+		<string>--import</string>
+		<string>tsx</string>
+		<string>__REPO__/packages/core/src/cli.ts</string>
+		<string>bot</string>
+		<string>--brand</string>
+		<string>__HOME__/.config/tasteloop/brands/__BRAND_ID__.yaml</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>30</integer>
+	<key>StandardOutPath</key>
+	<string>__HOME__/Library/Logs/tasteloop/bot.log</string>
+	<key>StandardErrorPath</key>
+	<string>__HOME__/Library/Logs/tasteloop/bot.log</string>
+</dict>
+</plist>

@@ -1,0 +1,9 @@
+{
+  "update_id": 1003,
+  "callback_query": {
+    "id": "cb-1",
+    "from": { "id": 111, "first_name": "Anna" },
+    "data": "lvl:__ID__:brand",
+    "message": { "message_id": 500, "date": 1762950001, "chat": { "id": -1001234567890, "type": "supergroup" } }
+  }
+}

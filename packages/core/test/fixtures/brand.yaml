@@ -1,0 +1,27 @@
+marke:
+  id: testmarke
+  name: Testmarke
+telegram:
+  chat_id: -1001234567890
+  absender:
+    "111": Anna
+    "222": Ben
+    "333": Cem
+vault:
+  wurzel: /wird/im/test/ersetzt
+  ordner: "Marke/Brand-System"
+brand_guide:
+  datei: "Marke/Brand Guide.md"
+  gesperrte_abschnitte:
+    - Leitgedanke
+    - "1. Marke"
+    - Was wir nie sagen
+  analyse_kontext:
+    - "3. Look and Feel"
+freigebende:
+  - Anna
+transkription:
+  lokal:
+    aktiv: false
+  api:
+    aktiv: false

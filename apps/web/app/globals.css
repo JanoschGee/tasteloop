@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/*
+ * Tasteloop, Stil D „Markup“: Papier, Tinte, Rotstift. Ruhig und menschlich.
+ * Nie: Verläufe, 3D, Glanz, Schatten-Effekte. Farbe bringen die Bilder,
+ * der Rotstift ist der einzige Akzent.
+ */
+:root {
+  --paper: #faf8f3;
+  --ink: #111111;
+  --pencil: #e2231a;
+  --muted: #6b6862;
+  --line: rgba(17, 17, 17, 0.14);
+  --card: #ffffff;
+}
+
+@theme inline {
+  --font-sans: "Helvetica Neue", Helvetica, "Inter", Arial, sans-serif;
+  /* Caveat wird mit dem Build ausgeliefert (siehe layout.tsx); Systemschriften nur als Notnagel */
+  --font-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-pencil: var(--pencil);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(226, 35, 26, 0.15);
+}
+
+.font-hand {
+  font-family: var(--font-hand);
+  font-weight: 400;
+}
+
+/* Prosa aus dem Vault */
+.prose-ab { font-size: 0.95rem; line-height: 1.7; color: #1f1f1f; }
+.prose-ab h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 1rem; }
+.prose-ab h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; margin: 2.2rem 0 0.75rem; }
+.prose-ab h3 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
+.prose-ab h4 { font-size: 0.95rem; font-weight: 700; margin: 1.25rem 0 0.5rem; color: #3a3a3a; }
+.prose-ab p { margin: 0.6rem 0; }
+.prose-ab ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
+.prose-ab ol { list-style: decimal; padding-left: 1.25rem; margin: 0.5rem 0; }
+.prose-ab li { margin: 0.2rem 0; }
+.prose-ab blockquote { border-left: 2px solid var(--pencil); padding-left: 1rem; color: #3a3a3a; margin: 1rem 0; }
+.prose-ab a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--pencil); }
+.prose-ab code { font-size: 0.85em; background: rgba(17, 17, 17, 0.05); padding: 0.1rem 0.3rem; border-radius: 3px; }
+.prose-ab pre { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 1rem; overflow-x: auto; font-size: 0.82rem; line-height: 1.6; }
+.prose-ab pre code { background: none; padding: 0; }
+.prose-ab table { border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+.prose-ab th, .prose-ab td { border-bottom: 1px solid var(--line); padding: 0.4rem 0.75rem 0.4rem 0; text-align: left; vertical-align: top; }
+.prose-ab img { border-radius: 2px; margin: 0.75rem 0; max-height: 420px; width: auto; border: 1px solid var(--line); }
+.prose-ab hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
+.diff-add { background: rgba(31, 111, 59, 0.08); color: #1f6f3b; display: block; }
+.diff-del { color: var(--pencil); display: block; text-decoration: line-through; text-decoration-color: var(--pencil); }

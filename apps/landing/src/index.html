@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tasteloop · Taste can't be prompted.</title>
+  <meta name="description" content="Tasteloop collects your team's taste, every reference and every why, and makes it readable for Claude and your agents. Free and open source.">
+  <meta name="theme-color" content="#FAF8F3">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/caveat-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <meta property="og:title" content="Tasteloop · Taste can't be prompted.">
+  <meta property="og:description" content="AI gets you 80% there. Your team knows the rest. Free and open source.">
+  <meta property="og:url" content="https://tasteloop.eu/">
+  <script src="/app.js" defer></script>
+  {{ANALYTICS}}
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <a href="/" class="brand" aria-label="Tasteloop home">{{LOGO}}</a>
+    <nav aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="#get">Get it</a>
+      <a href="{{REPO_URL}}" class="nav-cta">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Taste can't be <span class="circled">prompted.{{CIRCLE:hero:240:90}}</span></h1>
+      <p class="lede">AI gets you 80% there. Your team knows the rest.</p>
+      <p class="what">Tasteloop collects your team's taste (every reference, every “why”) and makes it readable for Claude and your agents.</p>
+      <p class="cta-row"><a class="button" href="#get">Get it free</a> <span class="note">why: <em>because the last 20% is yours.</em></span></p>
+    </section>
+
+    <section id="how" class="how" aria-labelledby="how-title">
+      <h2 id="how-title">How it works</h2>
+      <ol class="steps">
+        <li>
+          <h3><span class="circled">Circle it.{{CIRCLE:step1:150:70}}</span></h3>
+          <p>Drop a screenshot into your team chat. An ad, a photo, a colour, a line of copy.</p>
+        </li>
+        <li>
+          <h3>Say why.</h3>
+          <p>Add a voice note or a caption. <span class="note">why: the light, not the model.</span></p>
+          <p>It lands in a shared memory, with the image and the reason.</p>
+        </li>
+        <li>
+          <h3>Your agents get it.</h3>
+          <p>Every week, Tasteloop proposes rules for your brand guide. Approved rules become files your agents read, with the references as proof.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="team" aria-labelledby="team-title">
+      <h2 id="team-title">Built for teams, not for one person's taste</h2>
+      <ul class="pillars">
+        <li><h3>Everyone adds.</h3><p>Each contributor gets their own pen. You see who backs a rule: “3 people, 5 references”.</p></li>
+        <li><h3>Disagreements surface.</h3><p>If one person loves what another dislikes, Tasteloop shows both sides. Nothing contested quietly becomes a rule.</p></li>
+        <li><h3>Humans approve.</h3><p>Agents suggest. People decide. The core of your brand is locked and never changes on its own.</p></li>
+      </ul>
+    </section>
+
+    <section class="promise" aria-labelledby="promise-title">
+      <h2 id="promise-title">Our promise</h2>
+      <ul class="promises">
+        <li><strong>Your taste stays yours.</strong> Plain Markdown and images in your own Obsidian vault. No lock-in, nothing to export.</li>
+        <li><strong>Runs on your machine.</strong> Your laptop, a Mac mini or a small server. Only the AI calls leave it.</li>
+        <li><strong>Made for the last 20%.</strong> We like AI. We just think taste is a team sport. <mark class="loud">No slop.</mark></li>
+      </ul>
+    </section>
+
+    <section id="get" class="get" aria-labelledby="get-title">
+      <h2 id="get-title">Get it free</h2>
+      <p>Tasteloop is free and open source (MIT). Set it up yourself in about an hour, guided by Claude Code.</p>
+      <ol class="get-steps">
+        <li><a class="button" href="{{REPO_URL}}">Get it on GitHub</a></li>
+        <li>
+          <p class="prompt-label" id="prompt-label">Set it up with Claude Code in one prompt:</p>
+          <div class="prompt">
+            <code id="setup-prompt">Clone {{REPO_URL}} and set up tasteloop</code>
+            <button type="button" class="copy" data-copy="setup-prompt" aria-describedby="prompt-label" hidden>Copy</button>
+          </div>
+          <p class="small-note">Claude Code walks you through it step by step. You create the bot and the keys yourself; secrets never go into the chat.</p>
+        </li>
+      </ol>
+      <p class="later">Hosted version for teams: later.</p>
+      <p id="copy-status" class="sr-status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>{{LOGO_SMALL}} <span>Taste can't be prompted.</span></p>
+    <nav aria-label="Legal">
+      <a href="/imprint">Imprint</a>
+      <a href="/privacy">Privacy</a>
+    </nav>
+    <p class="small">No cookies. No forms. Fonts served from this site.</p>
+  </footer>
+</body>
+</html>
