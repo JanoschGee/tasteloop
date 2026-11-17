@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tasteloop · Taste can't be prompted.</title>
-  <meta name="description" content="Tasteloop collects your team's taste, every reference and every why, and makes it readable for Claude and your agents. Free and open source.">
+  <title>Tasteloop · Brand memory for AI-first teams</title>
+  <meta name="description" content="Drop references into your team chat and say why. Tasteloop turns them into rules your agents follow. A person approves every change. Free.">
   <meta name="theme-color" content="#FAF8F3">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/caveat-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
-  <meta property="og:title" content="Tasteloop · Taste can't be prompted.">
-  <meta property="og:description" content="AI gets you 80% there. Your team knows the rest. Free and open source.">
+  <meta property="og:title" content="Tasteloop · Brand memory for AI-first teams">
+  <meta property="og:description" content="AI makes everything look the same. Your team's taste is the difference. Free, runs on your own machine.">
   <meta property="og:url" content="https://tasteloop.eu/">
   <script src="/app.js" defer></script>
   {{ANALYTICS}}
@@ -36,23 +36,24 @@
     <a href="/" class="brand" aria-label="Tasteloop home">{{LOGO}}</a>
     <nav aria-label="Main">
       <a href="#how">How it works</a>
+      <a href="#stack">The stack</a>
       <a href="#team">For teams</a>
-      <a href="#get">Get it</a>
-      <a href="{{REPO_URL}}" class="nav-cta">GitHub</a>
+      <a href="#get" class="nav-cta">Get it free</a>
     </nav>
   </header>
 
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <h1 id="hero-title">Taste can't be <span class="circled">prompted.{{CIRCLE:hero:420:150}}</span></h1>
-        <p class="lede">AI gets you 80% there. Your team knows the rest.</p>
-        <p class="what">Tasteloop collects your team's taste (every reference, every “why”) and makes it readable for Claude and your agents.</p>
+        <h1 id="hero-title">Brand memory for <span class="circled">AI-first{{CIRCLE:hero:330:140}}</span> teams.</h1>
+        <p class="lede">AI makes everything look the same. Your team's taste is the difference.</p>
+        <p class="what">Drop references into your team chat and say why. Tasteloop turns them into rules your agents follow, and a person approves every change.</p>
+        <p class="what what-loop"><strong>That's the loop:</strong> the more your team adds, the more on-brand every output gets.</p>
         <p class="cta-row">
           <a class="button" href="#get">Get it free{{CIRCLE:cta-hero:190:70}}</a>
-          <span class="note hero-note">why: <em>because the last 20% is yours.</em></span>
+          <span class="note hero-note">Taste can't be prompted.</span>
         </p>
-        <p class="hero-meta">Free · open source (MIT) · runs on your own machine</p>
+        <p class="hero-meta">Free · runs on your own machine · your files stay yours</p>
       </div>
 
       <figure class="board" tabindex="0">
@@ -75,12 +76,12 @@
       <div class="hook-grid anim">
         <header class="hook-head">
           <p class="kicker">The problem</p>
-          <h2 id="hook-title">An AI made this ad in seconds.</h2>
+          <h2 id="hook-title">An AI made this image in seconds.</h2>
           <p class="section-lede">It's fine. It's also what everyone else gets. Then your team looks at it.</p>
         </header>
         <figure class="ad ad-before">
           <div class="ad-frame">
-            <img src="/img/ad-before.webp" width="640" height="800" alt="A glossy, generic coffee advert: a perfect cup floating in a coffee splash in front of a purple and orange background." loading="lazy">
+            <img src="/img/ad-before.webp" width="640" height="800" alt="A glossy, generic coffee image: a perfect cup floating in a coffee splash in front of a purple and orange background." loading="lazy">
             <p class="ad-line">Awaken your senses.</p>
             <span class="mark m-ad d2">{{CIRCLE:ad:300:300}}</span>
             <span class="note ad-note write d3">seen it a hundred times.</span>
@@ -97,7 +98,7 @@
         </div>
         <figure class="ad ad-after pop d8">
           <div class="ad-frame">
-            <img src="/img/ad-after.webp" width="640" height="800" alt="The same advert with the team's taste: a handmade cup of coffee on a wooden table in morning window light with long shadows." loading="lazy">
+            <img src="/img/ad-after.webp" width="720" height="900" alt="The same subject with the team's taste: a handmade cup of black coffee on rumpled linen, seen from above, with the long shadow of a window frame falling across it." loading="lazy">
             <p class="ad-line">Morning light, nothing staged.</p>
             <span class="stamp stamp-in d9">No slop</span>
           </div>
@@ -268,6 +269,59 @@
       </ol>
     </section>
 
+    <section id="stack" class="stack" aria-labelledby="stack-title">
+      <header class="section-head">
+        <p class="kicker">What it runs on</p>
+        <h2 id="stack-title">The whole system on one page</h2>
+        <p class="section-lede">What you need to run it: five parts, mostly tools you already know. No new app for your team to learn.</p>
+      </header>
+      <div class="sys anim">
+        <div class="sys-flow">
+        <div class="sys-rail" aria-hidden="true"><i class="dot"></i><i class="dot dot2"></i><i class="dot dot3"></i></div>
+        <ol class="sys-nodes">
+          <li class="node pop d1">
+            <p class="node-k">Capture</p>
+            <h3>Your team chat</h3>
+            <p class="badges"><span class="badge">Telegram</span><span class="badge">whisper.cpp</span></p>
+            <p class="node-p">Photos, captions, voice notes. Voice is transcribed locally, for free.</p>
+          </li>
+          <li class="node pop d2">
+            <p class="node-k">Understand</p>
+            <h3>Image + reason → note</h3>
+            <p class="badges"><span class="badge">Claude API</span></p>
+            <p class="node-p">Claude reads the image together with the why. A few cents per upload.</p>
+          </li>
+          <li class="node pop d3">
+            <p class="node-k">Remember</p>
+            <h3>Your vault</h3>
+            <p class="badges"><span class="badge">Obsidian</span><span class="badge">Markdown</span></p>
+            <p class="node-p">Plain files you own: brand guide, references, briefs.</p>
+          </li>
+          <li class="node pop d4">
+            <p class="node-k">Decide</p>
+            <h3>A person approves</h3>
+            <p class="badges"><span class="badge">Weekly digest</span></p>
+            <p class="node-p">Proposals with evidence and who backs them. The core stays locked.</p>
+          </li>
+          <li class="node pop d5">
+            <p class="node-k">Use</p>
+            <h3>Agents read the files</h3>
+            <p class="badges"><span class="badge">Claude Code</span><span class="badge">Claude</span><span class="badge">any agent</span></p>
+            <p class="node-p">No API, no plugin. Just the guide, the references and the briefs.</p>
+          </li>
+        </ol>
+        </div>
+        <div class="sys-back" aria-hidden="true">
+          <svg class="arrow sys-loop d6" viewBox="0 0 1000 60" preserveAspectRatio="none" focusable="false"><g filter="url(#rough)"><path class="bb" d="M-8 -8H1008V68H-8Z"/><path pathLength="1" d="M982 4C950 50 720 52 500 48C290 44 70 54 20 10"/><path pathLength="1" d="M8 30C11 22 15 15 19 8C26 13 33 16 42 17"/></g></svg>
+        </div>
+        <p class="note sys-note write d7">and round again: the more your team adds, the more on-brand it gets.</p>
+        <div class="sys-base pop d7">
+          <p><b>Runs on</b> your Mac or a small Linux server.</p>
+          <p><b>Set up with</b> Claude Code. You say: <code>set up tasteloop</code></p>
+        </div>
+      </div>
+    </section>
+
     <section id="team" class="team" aria-labelledby="team-title">
       <header class="section-head">
         <p class="kicker">For teams</p>
@@ -314,8 +368,8 @@
         <div class="loud-copy">
           <h2 id="loud-title">Stop the <span class="circled">slop.{{CIRCLE:slop:360:170:marker}}</span></h2>
           <p class="strip strip-1 pop d2">Taste can't be prompted.</p>
-          <p class="strip strip-2 pop d3">Your team knows the rest.</p>
-          <p class="loud-p">We like AI. It gets you 80% there, fast. The last 20% is why people notice you, and it lives in your team's heads. Tasteloop writes it down.</p>
+          <p class="strip strip-2 pop d3">Say why it matters.</p>
+          <p class="loud-p">AI gets you 80% there. Your team knows the rest. That last 20% is why people notice you, and it lives in your team's heads. Tasteloop writes it down.</p>
         </div>
         <figure class="loud-fig">
           <img src="/img/loud-tote.webp" width="720" height="720" alt="A black canvas tote bag on a yellow background, printed with the words NO SLOP in big yellow letters." loading="lazy">
@@ -340,18 +394,31 @@
       <div class="get-sheet anim">
         <span class="tape"></span>
         <h2 id="get-title"><span class="circled">Get it free{{CIRCLE:get:330:100}}</span></h2>
-        <p class="get-lede">Tasteloop is free and open source (MIT). Set it up yourself in about an hour, guided by Claude Code.</p>
-        <ol class="get-steps">
-          <li><a class="button" href="{{REPO_URL}}">Get it on GitHub{{CIRCLE:cta-get:230:70}}</a></li>
-          <li>
-            <p class="prompt-label" id="prompt-label">Set it up with Claude Code in one prompt:</p>
-            <div class="prompt">
-              <code id="setup-prompt">Clone {{REPO_URL}} and set up tasteloop</code>
-              <button type="button" class="copy" data-copy="setup-prompt" aria-describedby="prompt-label" hidden>Copy</button>
-            </div>
-            <p class="small-note">Claude Code walks you through it step by step. You create the bot and the keys yourself; secrets never go into the chat.</p>
-          </li>
-        </ol>
+        <p class="get-lede">Tasteloop is free. Tell us where to send the link, then set it up yourself in about an hour, guided by Claude Code.</p>
+        <form class="gate" id="gate" action="/api/subscribe" method="post">
+          <div class="gate-fields">
+            <p class="field">
+              <label for="gate-email">Your email</label>
+              <input id="gate-email" name="email" type="email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="you@company.com">
+            </p>
+            <p class="field">
+              <label for="gate-answer">How does your team keep AI output on-brand today?</label>
+              <textarea id="gate-answer" name="answer" required maxlength="500" rows="3" aria-describedby="gate-answer-hint"></textarea>
+              <span class="hint" id="gate-answer-hint">One or two sentences are plenty. Max 500 characters.</span>
+            </p>
+            <p class="check">
+              <input id="gate-updates" name="updates" type="checkbox" value="yes">
+              <label for="gate-updates">Send me occasional updates about Tasteloop.</label>
+            </p>
+            <p class="hp" aria-hidden="true">
+              <label for="gate-website">Leave this field empty</label>
+              <input id="gate-website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </p>
+            <p class="gate-send"><button class="button" type="submit">Send me the link{{CIRCLE:cta-get:230:70}}</button></p>
+            <p class="small-note">We'll email you the link. No spam. <a href="/privacy">Privacy</a></p>
+          </div>
+          <p id="gate-status" class="gate-status" role="status" aria-live="polite"></p>
+        </form>
         <p class="later">Hosted version for teams: later.</p>
         <p id="copy-status" class="sr-status" role="status" aria-live="polite"></p>
       </div>
@@ -364,7 +431,7 @@
       <a href="/imprint">Imprint</a>
       <a href="/privacy">Privacy</a>
     </nav>
-    <p class="small">No cookies. No forms. Fonts served from this site.</p>
+    <p class="small">No cookies. No tracking. Fonts served from this site.</p>
   </footer>
 </body>
 </html>

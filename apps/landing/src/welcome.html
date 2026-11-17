@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>You're in · Tasteloop</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FAF8F3">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="top"><a href="/" class="brand" aria-label="Tasteloop home">{{LOGO}}</a></header>
+  <main id="main" class="page welcome">
+    <p class="kicker">Confirmed</p>
+    <h1>You're in.</h1>
+    <p class="section-lede">Thanks for confirming. Here is Tasteloop. It is free and runs on your own machine.</p>
+    <p class="welcome-cta"><a class="button" href="{{REPO_URL}}">Get it on GitHub</a></p>
+
+    <h2>Set it up in one prompt</h2>
+    <p class="prompt-label" id="prompt-label">Open Claude Code and paste this:</p>
+    <div class="prompt">
+      <code id="setup-prompt">Clone {{REPO_URL}} and set up tasteloop</code>
+      <button type="button" class="copy" data-copy="setup-prompt" aria-describedby="prompt-label" hidden>Copy</button>
+    </div>
+    <p class="small-note">Claude Code walks you through it step by step. You create the bot and the keys yourself; secrets never go into the chat.</p>
+
+    <h2>What happens next</h2>
+    <ol class="next">
+      <li><strong>About an hour of setup.</strong> You need a Mac or a small Linux server, Node.js 22 or newer, an Obsidian vault, a Telegram account and an Anthropic API key.</li>
+      <li><strong>Add the bot to your team chat.</strong> Drop the first photo and say why it matters.</li>
+      <li><strong>Read the first digest.</strong> Once a week Tasteloop proposes changes to your brand guide. You approve, your agents read the result.</li>
+    </ol>
+    <p>Prefer doing it by hand? The step-by-step guide is in the repository under <code>docs/getting-started.md</code>.</p>
+    <p class="note welcome-note">Taste can't be prompted.</p>
+    <p id="copy-status" class="sr-status" role="status" aria-live="polite"></p>
+  </main>
+  <footer class="foot">
+    <nav aria-label="Legal"><a href="/imprint">Imprint</a> <a href="/privacy">Privacy</a></nav>
+  </footer>
+</body>
+</html>

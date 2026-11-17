@@ -65,7 +65,7 @@ a:focus-visible, button:focus-visible, .board:focus-visible { outline: 2px solid
 .page a { background-size: 100% 0.5em; }
 
 h1, h2, h3 { letter-spacing: -0.03em; line-height: 1.04; margin: 0 0 0.6em; text-wrap: balance; }
-h1 { font-size: clamp(2.9rem, 7.2vw, 5.7rem); font-weight: 800; letter-spacing: -0.045em; }
+h1 { font-size: clamp(2.7rem, 6.6vw, 5.2rem); font-weight: 800; letter-spacing: -0.045em; }
 h2 { font-size: clamp(2rem, 4.6vw, 3.3rem); font-weight: 800; letter-spacing: -0.04em; }
 h3 { font-size: 1.35rem; font-weight: 700; }
 p { margin: 0 0 1em; }
@@ -115,10 +115,11 @@ main > section { padding-top: clamp(3.5rem, 9vw, 7rem); padding-bottom: 1rem; }
 
 /* ---------- Hero ---------- */
 .hero { display: grid; gap: 2.5rem; align-items: center; padding-top: clamp(2.5rem, 7vw, 5rem) !important; }
-.lede { font-size: clamp(1.3rem, 2.6vw, 1.7rem); line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 1rem; max-width: 30ch; }
+.lede { font-size: clamp(1.3rem, 2.6vw, 1.7rem); line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 1rem; max-width: 26ch; }
 .what { max-width: 46ch; color: #262626; }
-.hero h1 .circle { left: -5%; top: -12%; width: 110%; height: 128%; }
-.hero-note { color: var(--pen); font-size: 1.65rem; }
+.hero h1 .circle { left: -7%; top: -10%; width: 114%; height: 124%; }
+.what-loop { margin-top: -0.3em; }
+.hero-note { color: var(--pencil); font-size: 1.75rem; }
 .hero-meta { font-size: 0.85rem; color: var(--muted); margin: 0; }
 
 .board { position: relative; margin: 0; }
@@ -357,6 +358,55 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
 .voices-h { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
 .voices-note { font-size: 0.95rem; color: #262626; margin: 0.4rem 0 0; max-width: 30ch; }
 
+/* ---------- Systembild: was man braucht ---------- */
+.sys-flow { position: relative; }
+.sys-rail { position: absolute; left: 0.55rem; top: 0.5rem; bottom: 2rem; width: 2px; background: var(--ink); }
+.dot { position: absolute; left: -4px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--pencil); opacity: 0; }
+.sys-nodes { list-style: none; margin: 0; padding: 0 0 0 2.2rem; display: grid; gap: 1.1rem; }
+.node { position: relative; background: var(--sheet) url("/img/grain.webp"); border: 1px solid var(--line); padding: 1rem 1.1rem 1.1rem; box-shadow: var(--shadow); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease; }
+.node::before { content: ""; position: absolute; left: -1.65rem; top: 1.45rem; width: 1.65rem; height: 2px; background: var(--ink); }
+.node::after { content: ""; position: absolute; left: -2rem; top: 1.1rem; width: 0.75rem; height: 0.75rem; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); }
+.node:hover { transform: translateY(-5px) rotate(-0.6deg); box-shadow: var(--shadow-up); }
+.node:nth-child(even):hover { transform: translateY(-5px) rotate(0.6deg); }
+.node-k { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pencil); margin: 0 0 0.45rem; }
+.node h3 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.6rem; }
+.badges { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0 0 0.65rem; }
+.badge { font: 0.74rem/1.2 var(--mono); border: 1.5px solid var(--ink); border-radius: 0.3rem; padding: 0.18rem 0.42rem; background: #fff; white-space: nowrap; }
+.node-p { font-size: 0.88rem; line-height: 1.45; margin: 0; color: #262626; }
+.sys-back { display: none; }
+.sys-note { display: block; margin: 1.3rem 0 0 2.2rem; font-size: 1.6rem; max-width: 22ch; }
+.sys-base { margin-top: 1.4rem; border: 2px solid var(--ink); background: var(--sheet) url("/img/grain.webp"); padding: 0.9rem 1.1rem; display: grid; gap: 0.3rem 2.5rem; font-size: 0.98rem; }
+.sys-base p { margin: 0; }
+.sys-base code { font: 0.88rem/1.3 var(--mono); border: 1.5px solid var(--ink); background: #fff; padding: 0.12rem 0.4rem; white-space: nowrap; }
+
+/* ---------- Formular (Anmeldung) ---------- */
+.gate { max-width: 34rem; margin-top: 1.6rem; }
+.field { margin: 0 0 1.1rem; }
+.field label, .check label { font-weight: 700; }
+.field label { display: block; margin-bottom: 0.4rem; line-height: 1.3; }
+.gate input[type="email"], .gate textarea { display: block; width: 100%; font: 1rem/1.45 var(--sans); color: var(--ink); background: #fff; border: 1.5px solid var(--ink); border-radius: 0; padding: 0.75rem 0.85rem; transition: box-shadow 0.2s ease, transform 0.2s ease; }
+.gate textarea { resize: vertical; min-height: 5.5rem; }
+.gate input[type="email"]:focus-visible, .gate textarea:focus-visible { outline: 2px solid var(--pencil); outline-offset: 2px; box-shadow: 5px 5px 0 var(--ink); transform: translate(-2px, -2px); }
+.gate ::placeholder { color: #8a867f; }
+.hint { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 0.35rem; }
+.check { display: flex; align-items: flex-start; gap: 0.6rem; margin: 0 0 1.4rem; }
+.check input { width: 1.2rem; height: 1.2rem; margin: 0.2rem 0 0; accent-color: var(--ink); flex: none; }
+.check label { font-weight: 400; }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.gate-send { margin: 0 0 0.9rem; }
+.gate .button[disabled] { opacity: 0.6; cursor: progress; }
+.gate .small-note a { text-decoration: underline; text-decoration-color: var(--pencil); }
+.gate-status { margin: 1rem 0 0; font-weight: 700; }
+.gate-status:empty { display: none; }
+.gate-status.err { color: #b3170f; border-left: 3px solid var(--pencil); padding-left: 0.8rem; }
+.gate.sent .gate-fields { display: none; }
+.gate.sent .gate-status { font-size: clamp(1.4rem, 3.4vw, 1.9rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin: 0; padding: 1.2rem 1.3rem; border: 2px solid var(--ink); background: #fff; transform: rotate(-0.6deg); }
+.welcome-cta { margin: 1.6rem 0 0.5rem; }
+.next { padding-left: 1.2rem; }
+.next li { margin-bottom: 0.6rem; }
+.welcome-note { font-size: 1.9rem; margin-top: 1.5rem; }
+.page .button, .page .button:hover { background: var(--ink); padding-bottom: 0.95rem; }
+
 /* ---------- Breiten ---------- */
 @media (min-width: 40rem) {
   .classify { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); }
@@ -368,6 +418,15 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
   .wall { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
   .hook-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1fr); gap: 2.5rem 3rem; }
   .hook-head { grid-column: 1 / -1; }
+  .sys-rail { left: 0; right: 0; top: 0.55rem; bottom: auto; width: auto; height: 2px; }
+  .dot { left: 0; top: -4px; }
+  .sys-nodes { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; padding: 2.2rem 0 0; }
+  .node::before { left: 1.45rem; top: -1.65rem; width: 2px; height: 1.65rem; }
+  .node::after { left: 1.1rem; top: -2rem; }
+  .sys-back { display: block; position: relative; height: 3.6rem; margin: 0.6rem 2% 0; }
+  .sys-loop { left: 0; top: 0; width: 100%; height: 100%; }
+  .sys-note { margin: 0.2rem 0 0; text-align: center; max-width: none; }
+  .sys-base { grid-template-columns: auto auto; justify-content: space-between; margin-top: 1.6rem; }
   .voices { padding-top: 1.5rem; }
 }
 @media (max-width: 39.99rem) {
@@ -403,6 +462,8 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes scan { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 0.9; } 85% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(15rem); } }
 @keyframes drift { from { transform: rotate(1.6deg); } to { transform: rotate(-1.2deg) translateY(-28px); } }
+@keyframes flowx { 0% { left: 0; opacity: 0; } 6% { opacity: 1; } 94% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+@keyframes flowy { 0% { top: 0; opacity: 0; } 6% { opacity: 1; } 94% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
 @keyframes slam { from { transform: rotate(-9deg) scale(0.82); } to { transform: rotate(-2.5deg) scale(1); } }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -416,7 +477,7 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
   .hero-copy > :nth-child(5) { animation-delay: 0.4s; }
   .hero h1 .circle path { animation: draw 0.9s 0.7s cubic-bezier(0.6, 0.1, 0.3, 1) both; }
   .hero h1 .circle path:last-child { animation-delay: 1.45s; animation-duration: 0.6s; }
-  .hero-note { animation: write 1s 1.7s linear both; }
+  .hero-note { animation: write 0.9s 1.7s linear both; }
   .board { animation: drop 0.8s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
   .mark-chair .circle path { animation: draw 0.9s 1.3s cubic-bezier(0.6, 0.1, 0.3, 1) both; }
   .mark-chair .circle path:last-child { animation-delay: 2s; animation-duration: 0.6s; }
@@ -435,6 +496,12 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
     .mark-note-more { animation: write 0.6s 4.6s linear both; }
     .mark-note-yes { animation: write 0.4s 5.3s linear both; }
   }
+
+  /* Systembild: Punkte laufen die Schiene entlang, solange der Block sichtbar war */
+  .js .sys.in .dot { animation: flowy 6s linear infinite; }
+  .js .sys.in .dot2 { animation-delay: 2s; }
+  .js .sys.in .dot3 { animation-delay: 4s; }
+  @media (min-width: 58rem) { .js .sys.in .dot { animation-name: flowx; } }
 
   /* Hover-Kreise */
   .button .circle path, .rail .circle path { transition: stroke-dashoffset 0.5s cubic-bezier(0.6, 0.1, 0.3, 1); }

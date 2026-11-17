@@ -18,10 +18,13 @@ afterAll(() => build());
 describe("Inhalt", () => {
   it("enthält die vereinbarten Aussagen", () => {
     for (const s of [
-      "Taste can't be",
+      "Brand memory for",
+      "AI makes everything look the same. Your team's taste is the difference.",
+      "Drop references into your team chat and say why. Tasteloop turns them into rules your agents follow, and a person approves every change.",
+      "the more your team adds, the more on-brand every output gets.",
+      "Taste can't be prompted.",
       "AI gets you 80% there. Your team knows the rest.",
-      "Tasteloop collects your team's taste (every reference, every “why”) and makes it readable for Claude and your agents.",
-      "An AI made this ad in seconds.",
+      "An AI made this image in seconds.",
       "Drop a photo into the team chat.",
       "Say why it matters.",
       "Anyone on the team can add to it.",
@@ -34,17 +37,38 @@ describe("Inhalt", () => {
       "Humans approve.",
       "Your taste stays yours.",
       "Get it free",
-      "Set it up with Claude Code in one prompt",
+      "How does your team keep AI output on-brand today?",
+      "Send me occasional updates about Tasteloop.",
+      "We'll email you the link. No spam.",
       "Hosted version for teams: later.",
-      "MIT",
     ]) expect(html, s).toContain(s);
+    expect(html).toMatch(/<h1 id="hero-title">Brand memory for <span class="circled">AI-first<svg[\s\S]*?<\/svg><\/span> teams\.<\/h1>/);
   });
-  it("Haupt-CTA führt zum echten Repo, der Setup-Prompt ist kopierbar", () => {
-    expect(REPO_URL).toBe("https://github.com/JanoschGee/tasteloop");
-    expect(html).toContain(`href="${REPO_URL}"`);
-    expect(html).toContain(`<code id="setup-prompt">Clone ${REPO_URL} and set up tasteloop</code>`);
-    expect(html).toMatch(/<button type="button" class="copy" data-copy="setup-prompt"[^>]*hidden>Copy<\/button>/);
-    expect(html).not.toContain("&lt;org&gt;");
+  it("nennt weder die Lizenz noch den Namen eines Wettbewerbers", () => {
+    expect(html).not.toMatch(/\bMIT\b|open source|open-source/i);
+    expect(html).not.toMatch(/brand\s?os\b/i);
+  });
+  it("Systembild: fünf Teile mit den Werkzeugen, die man braucht", () => {
+    const sys = /<section id="stack"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
+    for (const k of ["Capture", "Understand", "Remember", "Decide", "Use"]) expect(sys, k).toContain(`<p class="node-k">${k}</p>`);
+    for (const b of ["Telegram", "whisper.cpp", "Claude API", "Obsidian", "Markdown", "Weekly digest", "Claude Code", "any agent"]) expect(sys, b).toContain(`<span class="badge">${b}</span>`);
+    for (const t of ["your Mac or a small Linux server", "<code>set up tasteloop</code>", "The core stays locked."]) expect(sys, t).toContain(t);
+    expect(sys).not.toMatch(/<img\b/);
+    expect(sys).toContain('class="dot"');
+    expect(read("styles.css")).toMatch(/\.js \.sys\.in \.dot \{ animation: flowy/);
+  });
+  it("der Link zum Repo steht nur auf /welcome, nicht auf den öffentlichen Seiten", () => {
+    expect(REPO_URL).toMatch(/^https:\/\/github\.com\/[\w-]+\/tasteloop$/);
+    for (const f of ["index.html", "imprint.html", "privacy.html", "check-inbox.html", "try-again.html"]) expect(read(f), f).not.toMatch(/github\.com/i);
+    expect(html).not.toMatch(/>GitHub</);
+    const w = read("welcome.html");
+    expect(w).toContain("You're in.");
+    expect(w).toContain(`<a class="button" href="${REPO_URL}">Get it on GitHub</a>`);
+    expect(w).toContain(`<code id="setup-prompt">Clone ${REPO_URL} and set up tasteloop</code>`);
+    expect(w).toMatch(/<button type="button" class="copy" data-copy="setup-prompt"[^>]*hidden>Copy<\/button>/);
+    expect(w).not.toContain("&lt;org&gt;");
+    for (const f of ["welcome.html", "check-inbox.html", "try-again.html"]) expect(read(f), f).toContain('<meta name="robots" content="noindex">');
+    expect(read("check-inbox.html")).toContain("Check your inbox to confirm. The link comes right after.");
   });
   it("Wortmarke mit Stiftkreis inline, Kreise als echte Stiftzüge", () => {
     expect(html).toMatch(/<svg[^>]*aria-hidden="true"[^>]*>[\s\S]*?taste<tspan>loop<\/tspan>/);
@@ -77,12 +101,40 @@ describe("Inhalt", () => {
   });
 });
 
-describe("Keine personenbezogenen Daten, kein Cloudflare mehr", () => {
-  it("kein Formular, keine Eingabefelder, keine Warteliste, keine Functions oder Wrangler-Reste", () => {
-    const all = readdirSync(dist).filter((f) => f.endsWith(".html")).map(read).join("\n");
-    expect(all).not.toMatch(/<form|<input|<select|<textarea|waitlist|\/api\//i);
+describe("Anmeldeformular", () => {
+  it("genau ein Formular, nur auf der Startseite, das ohne JavaScript an die eigene Funktion sendet", () => {
+    const pages = readdirSync(dist).filter((f) => f.endsWith(".html"));
+    for (const f of pages.filter((f) => f !== "index.html")) expect(read(f), f).not.toMatch(/<form|<input|<select|<textarea/i);
+    expect((html.match(/<form\b/g) ?? []).length).toBe(1);
+    expect(html).toContain('<form class="gate" id="gate" action="/api/subscribe" method="post">');
+    expect(html).not.toMatch(/waitlist/i);
     for (const f of ["functions", "wrangler.toml", "migrations"]) expect(existsSync(join(here, f)), f).toBe(false);
     expect(existsSync(join(dist, "_headers"))).toBe(false);
+    expect(existsSync(join(here, "api/subscribe.ts"))).toBe(true);
+  });
+  it("jedes Feld hat ein Label; E-Mail und Antwort sind Pflicht, Updates sind nicht vorangekreuzt, Honigtopf ist da", () => {
+    const form = /<form[\s\S]*?<\/form>/.exec(html)?.[0] ?? "";
+    const fields = form.match(/<(input|textarea)\b[^>]*>/g) ?? [];
+    expect(fields.length).toBe(4);
+    for (const tag of fields) {
+      const id = /\sid="([\w-]+)"/.exec(tag)?.[1];
+      expect(id, tag).toBeTruthy();
+      expect(form, tag).toContain(`<label for="${id}">`);
+    }
+    expect(form).toMatch(/<input id="gate-email" name="email" type="email" required maxlength="254"/);
+    expect(form).toMatch(/<textarea id="gate-answer" name="answer" required maxlength="500"/);
+    expect(form).toMatch(/<input id="gate-updates" name="updates" type="checkbox" value="yes">/);
+    expect(form).not.toMatch(/checked/);
+    expect(form).toMatch(/<p class="hp" aria-hidden="true">[\s\S]*name="website" type="text" tabindex="-1" autocomplete="off"/);
+    expect(form).toContain('<a href="/privacy">Privacy</a>');
+    expect(form).toMatch(/<button class="button" type="submit">Send me the link/);
+    expect(form).toMatch(/id="gate-status"[^>]*role="status" aria-live="polite"/);
+  });
+  it("Datenschutz nennt das Formular und den Auftragsverarbeiter, der neue Abschnitt ist zur Prüfung markiert", () => {
+    const p = read("privacy.html");
+    expect(p).toContain("<!-- review: Brevo section added 17.11. -->");
+    for (const t of ["Sign-up form and e-mails", "Sendinblue SAS, 106 boulevard Haussmann, 75008 Paris, France", "Art. 6(1)(b) GDPR", "Art. 6(1)(a) GDPR", "Art. 6(1)(f) GDPR", "double opt-in", "deleted after 30 days", "data processing agreement with Brevo"]) expect(p, t).toContain(t);
+    expect(p).not.toMatch(/has no forms/);
   });
 });
 
@@ -119,7 +171,11 @@ describe("Bilder, Bewegung und CSP", () => {
     expect(all).not.toMatch(/\son[a-z]+\s*=\s*["']/i);
     for (const tag of all.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []) expect(tag, tag).toMatch(/^<script (defer )?src="\/[^"]+"( defer)?><\/script>$/);
     const js = read("app.js");
-    expect(js).not.toMatch(/\beval\(|new Function|innerHTML|\.style\.|setAttribute\("style"|fetch\(|XMLHttpRequest|import\(/);
+    expect(js).not.toMatch(/\beval\(|new Function|innerHTML|\.style\.|setAttribute\("style"|XMLHttpRequest|import\(/);
+    // der einzige Netzwerkaufruf geht an das eigene Formularziel (connect-src 'self')
+    expect((js.match(/fetch\(/g) ?? []).length).toBe(1);
+    expect(js).toContain('fetch(gate.getAttribute("action")');
+    expect(js).not.toMatch(/https?:\/\//);
   });
   it("Bewegung: Stiftzüge sind zeichenbar, ohne Bewegung und ohne JavaScript bleibt alles lesbar", () => {
     const css = read("styles.css");
@@ -152,7 +208,7 @@ describe("Barrierearm und schnell", () => {
     expect(html).toMatch(/role="status" aria-live="polite"/);
   });
   it("lädt nichts von fremden Hosts und setzt keine Tracker (Standard)", () => {
-    const all = ["index.html", "imprint.html", "privacy.html", "styles.css", "app.js"].map(read).join("\n");
+    const all = ["index.html", "imprint.html", "privacy.html", "welcome.html", "check-inbox.html", "try-again.html", "styles.css", "app.js"].map(read).join("\n");
     expect(all).not.toMatch(/(src|srcset)="https?:\/\//);
     expect(all).not.toMatch(/@import|\/\/[\w.-]+\.(com|net|org|io)\/[^"\s]*\.(js|css|woff2?)/);
     expect(all).not.toMatch(/url\(["']?https?:/);
@@ -174,13 +230,20 @@ describe("Vercel", () => {
   });
   it("dieselben Sicherheitsheader wie bisher", () => {
     expect(headers["Content-Security-Policy"]).toBe(
-      "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'",
+      "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'",
     );
     expect(headers["Strict-Transport-Security"]).toBe("max-age=31536000; includeSubDomains");
     expect(headers["Referrer-Policy"]).toBe("strict-origin-when-cross-origin");
     expect(headers["Permissions-Policy"]).toContain("camera=()");
     expect(headers["X-Content-Type-Options"]).toBe("nosniff");
     expect(headers["X-Frame-Options"]).toBe("DENY");
+  });
+  it("beide vercel.json (Projektwurzel und apps/landing) tragen dieselbe CSP", () => {
+    const root = JSON.parse(readFileSync(join(here, "../../vercel.json"), "utf8"));
+    const rootCsp = root.headers[0].headers.find((h: { key: string }) => h.key === "Content-Security-Policy").value;
+    expect(rootCsp).toBe(headers["Content-Security-Policy"]);
+    expect(rootCsp).toContain("script-src 'self'; style-src 'self'");
+    expect(rootCsp).toContain("connect-src 'self'; form-action 'self'");
   });
   it("interne Links passen zu Clean URLs", () => {
     expect(html).toContain('href="/imprint">Imprint<');

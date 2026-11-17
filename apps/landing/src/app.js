@@ -39,7 +39,37 @@
     });
   }
 
-  // 3) Kopieren-Knopf für den Setup-Prompt. Ohne Zwischenablage bleibt er versteckt, der Prompt ist markierbar.
+  // 3) Anmeldeformular: ohne JavaScript ein normales POST mit Weiterleitung, hier mit fetch und Meldung an Ort und Stelle
+  var gate = document.getElementById("gate");
+  var gateStatus = document.getElementById("gate-status");
+  if (gate && gateStatus && window.fetch && window.URLSearchParams && window.FormData) {
+    gate.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var btn = gate.querySelector("button[type=submit]");
+      if (btn.disabled) return;
+      btn.disabled = true;
+      gateStatus.className = "gate-status";
+      gateStatus.textContent = "Sending…";
+      var fail = function (msg) {
+        btn.disabled = false;
+        gateStatus.className = "gate-status err";
+        gateStatus.textContent = msg || "That didn't work. Please try again in a moment.";
+      };
+      fetch(gate.getAttribute("action"), {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(new FormData(gate)).toString(),
+      }).then(function (res) {
+        return res.json().then(function (data) {
+          if (!res.ok || !data.ok) return fail(data.message);
+          gate.classList.add("sent");
+          gateStatus.textContent = data.message;
+        });
+      }).catch(function () { fail(); });
+    });
+  }
+
+  // 4) Kopieren-Knopf für den Setup-Prompt (Seite /welcome). Ohne Zwischenablage bleibt er versteckt, der Prompt ist markierbar.
   if (!navigator.clipboard) return;
   var status = document.getElementById("copy-status");
   Array.prototype.forEach.call(document.querySelectorAll("button.copy"), function (btn) {
