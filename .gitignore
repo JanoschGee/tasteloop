@@ -28,3 +28,4 @@ coverage/
 # Persönliche Marken-Configs gehören nach ~/.config/tasteloop/brands/, nicht ins Repo
 brands/*
 !brands/example.yaml
+vercel-out/

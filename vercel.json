@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "npm ci",
-  "buildCommand": "npx tsx apps/landing/build.ts --live",
-  "outputDirectory": "apps/landing/dist",
+  "installCommand": "R=\"$PWD\"; while [ ! -d \"$R/apps/landing\" ] && [ \"$R\" != / ]; do R=\"$(dirname \"$R\")\"; done; cd \"$R\" && npm ci",
+  "buildCommand": "R=\"$PWD\"; while [ ! -d \"$R/apps/landing\" ] && [ \"$R\" != / ]; do R=\"$(dirname \"$R\")\"; done; (cd \"$R\" && npx tsx apps/landing/build.ts --live) && mkdir -p vercel-out && cp -R \"$R/apps/landing/dist/.\" vercel-out/",
+  "outputDirectory": "vercel-out",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
