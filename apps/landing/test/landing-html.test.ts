@@ -131,8 +131,8 @@ describe("Impressum, Datenschutz und Livegang", () => {
     }
   });
   it("der Live-Build bricht ab bei Entwürfen und offenen TODO", () => {
-    expect(() => build({ live: true })).toThrow(/Entwurfsseiten/);
-    expect(() => build({ repoUrl: "javascript:alert(1)" })).toThrow(/Repo-URL/);
+    expect(() => build({ live: true })).toThrow(/draft pages/);
+    expect(() => build({ repoUrl: "javascript:alert(1)" })).toThrow(/repo URL/);
   });
   it("auf Vercel gilt der Entwurfsschutz nur für die Produktion", () => {
     expect(liveRequested(["--live"], { VERCEL_ENV: "production" })).toBe(true);

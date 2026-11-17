@@ -1,67 +1,69 @@
-# Example brand configuration. Copy to brands/<your-brand>.yaml and adjust.
+# Example brand configuration. Copy to ~/.config/tasteloop/brands/<your-brand>.yaml and adjust.
 # One file per brand. Code and UI never contain a brand name; everything brand-specific lives here.
 # NEVER put tokens or API keys here. They go into ~/.config/tasteloop/.env (see docs/security.md).
-# Keys are German for historical reasons; docs/configuration.md explains every one of them.
+# Every key is explained in docs/configuration.md.
 
-marke:
+brand:
   id: your-brand              # lowercase, digits, dashes; used for service names and state
   name: Your Brand            # shown in notes, prompts and the gallery
 
-sprache: de                   # language of bot messages and notes (currently only "de")
+language: en                  # language of analyses, digests and briefs: en or de (the interface is English)
+
+channels: [telegram]          # capture channels; currently Telegram
 
 telegram:
   chat_id: -1000000000000     # your group's ID (find it with: npm run ids)
-  absender:                   # Telegram user ID -> name in notes. Same name = same person.
+  senders:                    # Telegram user ID -> name in notes. Same name = same person.
     "100000001": Alex
     "100000002": Sam
-  nur_bekannte_absender: true # ignore anyone not listed above
-  zuordnung_minuten: 15       # a voice note without reply is attached to the sender's last image within this window
+  known_senders_only: true    # ignore anyone not listed above
+  attach_minutes: 15          # a voice note without reply is attached to the sender's last image within this window
 
 vault:
-  wurzel: /Users/you/Obsidian/YourVault   # absolute path to the Obsidian vault (folder containing .obsidian)
-  ordner: "Brand/Tasteloop"               # where Tasteloop writes uploads, proposals, briefs, gallery, moodboard
-  # sync_nur: "Brand"                     # optional: the only folder that should exist on an always-on host
+  root: /Users/you/Obsidian/YourVault     # absolute path to the Obsidian vault (folder containing .obsidian)
+  folder: "Brand/Tasteloop"               # where Tasteloop writes uploads, proposals, briefs, gallery, moodboard
+  # sync_only: "Brand"                    # optional: the only folder that should exist on an always-on host
 
-brand_guide:
-  datei: "Brand/Brand Guide.md"           # your guide, relative to the vault root (start from templates/brand-guide.md)
-  gesperrte_abschnitte: []                # extra locked headings (the guide's frontmatter lists the main ones)
-  frontmatter_sperre: locked              # frontmatter key in the guide that lists locked headings
-  praeambel_gesperrt: true                # title and intro are locked
-  lernbereich:                            # changes only ever land in these sections
+guide:
+  file: "Brand/Brand Guide.md"            # your guide, relative to the vault root (start from templates/brand-guide.md)
+  locked_key: locked                      # frontmatter key in the guide that lists locked headings
+  locked: []                              # extra locked headings, in addition to the frontmatter list
+  preamble_locked: true                   # title and intro are locked
+  learning:                               # changes only ever land in these sections
     - "2. Expression (learns)"
-  gesperrte_tokens:                       # lines containing these never change, even inside the learning part
+  locked_tokens:                          # lines containing these never change, even inside the learning part
     - "`color.base`"
     - "`color.ink`"
-  protokoll_abschnitt: "4. Change log"    # every applied change adds a row here
-  version_feld: version                   # frontmatter key incremented on every change
-  datum_feld: updated                     # frontmatter key set to today on every change
-  analyse_kontext: []                     # sections the image analysis reads (empty = whole guide)
-  briefing_bausteine: "2.5 Prompt building blocks"
-  briefing_anhaenge:
+  changelog_section: "4. Changelog"       # every applied change adds a row here
+  version_key: version                    # frontmatter key incremented on every change
+  date_key: updated                       # frontmatter key set to today on every change
+  analysis_context: []                    # sections the image analysis reads (empty = whole guide)
+  brief_blocks: "2.5 Prompt building blocks"
+  brief_appendix:
     - "2.6 Review checklist"
 
-freigebende:                  # who may approve proposals (property freigegeben_von); trust-based, see docs
+approvers:                    # who may approve proposals (property approved_by); trust-based, see docs
   - Alex
   - Sam
 
-modelle:
-  analyse: claude-sonnet-5-5
+models:
+  analysis: claude-sonnet-5-5
   digest: claude-sonnet-5-5
-  briefing: claude-sonnet-5-5
+  brief: claude-sonnet-5-5
 
-transkription:
-  lokal:
-    aktiv: true
+transcription:
+  local:
+    enabled: true
     binary: whisper-cli
-    modell: ~/.local/share/whisper/ggml-large-v3-turbo-q5_0.bin
+    model: ~/.local/share/whisper/ggml-large-v3-turbo-q5_0.bin
     ffmpeg: ffmpeg
-    sprache: en
-    timeout_sekunden: 180
+    language: en              # spoken language of voice notes
+    timeout_seconds: 180
   api:
-    aktiv: false              # true + a key in .env to fall back to ElevenLabs or OpenAI
-    anbieter: elevenlabs
+    enabled: false            # true + a key in .env to fall back to ElevenLabs or OpenAI
+    provider: elevenlabs
 
-analyse_bei_merken: false     # analyse "just keep" uploads too (costs a little)
+analyze_keep: false           # also analyse "Just keep" uploads (costs a little)
 
 web:
   url: https://tasteloop.example.com      # optional, only used for links in chat messages

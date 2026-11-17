@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Rotstift-Kreis um ein Element. Ein echter Stiftzug (lib/pencil.ts), zwei Durchgänge
- * wie bei Buntstift, zeichnet sich einmal ein. Keine Verläufe, kein Glanz.
+ * Red pencil circle around an element. A real pencil stroke (lib/pencil.ts), two passes like a
+ * coloured pencil, drawn in once. No gradients, no gloss.
  */
 import { motion, useReducedMotion } from "motion/react";
 import { pencilCircle, seedOf } from "@/lib/pencil";

@@ -45,11 +45,11 @@ describe("whisper.cpp", () => {
   });
   it("ohne Fallback-Key gibt es eine klare Fehlermeldung", async () => {
     const { cfg } = makeVault((c) => {
-      c.transkription.lokal.aktiv = false;
-      c.transkription.api.aktiv = true;
+      c.transcription.local.enabled = false;
+      c.transcription.api.enabled = true;
     });
     const t = buildTranscriber(cfg, {}, silentLogger);
-    await expect(t.transcribe(Buffer.from("x"), "a.oga")).rejects.toThrow(/kein Transkriber/);
+    await expect(t.transcribe(Buffer.from("x"), "a.oga")).rejects.toThrow(/no transcriber configured/);
   });
 });
 

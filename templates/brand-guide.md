@@ -14,7 +14,7 @@ locked: ["1. Core (locked)"]
 ## How to use this guide
 
 - **Part 1 Core** is locked. No agent and no job writes into it, not even after an approval.
-- **Part 2 Expression** learns. Proposals arrive as separate notes with evidence images and a marked diff. After `status: freigegeben` (approved) they are applied here and logged in Part 4.
+- **Part 2 Expression** learns. Proposals arrive as separate notes with evidence images and a marked diff. After `status: approved` they are applied here and logged in Part 4.
 - **Part 3 References** shows the gallery of everything your team collected.
 - **Ground rule for every reference:** the style of the reference, the identity of your brand. Never copy someone else's motifs, claims, characters or layouts one to one.
 
@@ -91,14 +91,14 @@ One "no" is enough to reject an image:
 
 ## 3. References
 
-![[Tasteloop/Galerie.base#Brand]]
+![[Tasteloop/Gallery.base#Brand]]
 
 - **Moodboard:** `Tasteloop/Moodboard.canvas`
-- **Open proposals:** notes with `typ: vorschlag` and `status: offen`
+- **Open proposals:** notes with `type: proposal` and `status: open`
 
 ---
 
-## 4. Change log
+## 4. Changelog
 
 | Date | Part | Change | Evidence | Approved by |
 |---|---|---|---|---|

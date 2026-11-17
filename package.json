@@ -26,7 +26,8 @@
     "build:landing": "tsx apps/landing/build.ts",
     "check:public": "tsx scripts/check-public.ts",
     "ids": "tsx packages/core/src/cli.ts ids",
-    "sync-plan": "tsx packages/core/src/cli.ts sync-plan"
+    "sync-plan": "tsx packages/core/src/cli.ts sync-plan",
+    "migrate-en": "tsx packages/core/src/cli.ts migrate-en"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

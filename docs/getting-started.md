@@ -57,7 +57,7 @@ Find the chat ID and the user IDs. Everyone writes something in the group first,
 npm run ids -- --brand ~/.config/tasteloop/brands/your-brand.yaml
 ```
 
-Copy the negative group ID into `telegram.chat_id` and every user ID with a name into `telegram.absender`.
+Copy the negative group ID into `telegram.chat_id` and every user ID with a name into `telegram.senders`.
 
 ## 6. Brand guide and vault
 

@@ -1,46 +1,46 @@
-# Brand Guide Testmarke
+# Brand Guide Testbrand
 
-**Status:** Fixture für Tests. Vorspann ist gesperrt.
+**Status:** test fixture. The intro is locked.
 
-## Leitgedanke
+## Purpose
 
-Wir sprechen mutig und warm. Das ist Kern.
+We speak boldly and warmly. This is core.
 
-## 1. Marke
+## 1. Brand
 
-### Charakter
+### Character
 
-Neugierig, verspielt, ehrlich.
+Curious, playful, honest.
 
-### Name und Schreibweise
+### Name and spelling
 
-Immer klein geschrieben.
+Always lowercase.
 
-## 2. Sprache
+## 2. Language
 
-### Anrede
+### Address
 
-Wir duzen.
+We use first names.
 
-### Was wir nie sagen
+### What we never say
 
-- Keine Heilsversprechen.
+- No miracle promises.
 
 ## 3. Look and Feel
 
-### Bildwelt
+### Imagery
 
-Echte Menschen, kein Stock.
+Real people, no stock.
 
-### Farbe
+### Colour
 
-Warmes Off-White als Grund.
-Akzent in Terrakotta.
+Warm off-white as the base.
+Terracotta as the accent.
 
-### Typografie
+### Typography
 
-Eine Grotesk, eine Serif für Zitate.
+One grotesque, one serif for quotes.
 
-## 4. Offen
+## 4. Open
 
-- Logo noch offen.
+- Logo still open.

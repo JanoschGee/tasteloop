@@ -54,7 +54,7 @@ export function analyticsTag(on: boolean | undefined): string {
 export function render(html: string, opts: BuildOptions = {}): string {
   const logo = inlineLogo();
   const repo = opts.repoUrl ?? REPO_URL;
-  if (!/^https:\/\/[^\s"']+$/.test(repo)) throw new Error(`Ungültige Repo-URL: ${repo}`);
+  if (!/^https:\/\/[^\s"']+$/.test(repo)) throw new Error(`Invalid repo URL: ${repo}`);
   const out = html
     .replace(/\{\{LOGO\}\}/g, logo)
     .replace(/\{\{LOGO_SMALL\}\}/g, logo)
@@ -62,7 +62,7 @@ export function render(html: string, opts: BuildOptions = {}): string {
     .replace(/\{\{ANALYTICS\}\}/g, analyticsTag(opts.analytics))
     .replace(/\{\{CIRCLE:([\w-]+):(\d+):(\d+)\}\}/g, (_m, seed: string, w: string, h: string) => circleSvg(seed, Number(w), Number(h)));
   const left = /\{\{[A-Z_:\w-]+\}\}/.exec(out);
-  if (left) throw new Error(`Platzhalter nicht ersetzt: ${left[0]}`);
+  if (left) throw new Error(`Placeholder not replaced: ${left[0]}`);
   return out;
 }
 
@@ -79,15 +79,15 @@ export function build(opts: BuildOptions = {}): string[] {
   }
   copyFileSync(join(repo, "apps/web/app/icon.svg"), join(dist, "icon.svg"));
   const font = join(repo, "node_modules/@fontsource/caveat/files/caveat-latin-400-normal.woff2");
-  if (!existsSync(font)) throw new Error("Caveat fehlt: npm install im Repo ausführen");
+  if (!existsSync(font)) throw new Error("Caveat missing: run npm install in the repo");
   copyFileSync(font, join(dist, "fonts/caveat-latin-400-normal.woff2"));
   copyFileSync(join(repo, "node_modules/@fontsource/caveat/LICENSE"), join(dist, "fonts/caveat-LICENSE.txt"));
   written.push("icon.svg", "fonts/caveat-latin-400-normal.woff2");
   if (opts.live) {
     const drafts = readdirSync(dist).filter((f) => f.endsWith(".html") && readFileSync(join(dist, f), "utf8").includes('data-draft="true"'));
-    if (drafts.length) throw new Error(`Nicht live schalten: Entwurfsseiten ${drafts.join(", ")}. Erst die echten Texte einsetzen.`);
+    if (drafts.length) throw new Error(`Not for production: draft pages ${drafts.join(", ")}. Put in the final texts first.`);
     const todos = readdirSync(dist).filter((f) => f.endsWith(".html") && readFileSync(join(dist, f), "utf8").includes("[TODO"));
-    if (todos.length) throw new Error(`Nicht live schalten: offene [TODO] in ${todos.join(", ")}.`);
+    if (todos.length) throw new Error(`Not for production: open [TODO] in ${todos.join(", ")}.`);
   }
   return written;
 }
@@ -99,7 +99,7 @@ export function build(opts: BuildOptions = {}): string[] {
 export function liveRequested(argv: string[], env: Record<string, string | undefined>): boolean {
   if (!argv.includes("--live")) return false;
   if (env.VERCEL_ENV && env.VERCEL_ENV !== "production") {
-    console.warn(`Hinweis: VERCEL_ENV=${env.VERCEL_ENV}, baue als Entwurf (Entwurfsschutz gilt nur für die Produktion).`);
+    console.warn(`Note: VERCEL_ENV=${env.VERCEL_ENV}, building as a draft (the draft guard only applies to production).`);
     return false;
   }
   return true;
@@ -110,7 +110,7 @@ if (isMain) {
   try {
     const arg = (k: string) => process.argv.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3);
     const files = build({ live: liveRequested(process.argv, process.env), repoUrl: arg("repo-url"), analytics: process.argv.includes("--analytics") });
-    console.log(`Landing gebaut: ${files.length} Dateien in ${dist}`);
+    console.log(`Landing page built: ${files.length} files in ${dist}`);
   } catch (err) {
     console.error(err instanceof Error ? err.message : err);
     process.exit(1);

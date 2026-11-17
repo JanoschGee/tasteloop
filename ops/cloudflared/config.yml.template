@@ -1,5 +1,5 @@
-# Vorlage für ~/.cloudflared/config.yml des Dienstbenutzers.
-# Die Credentials-Datei (<TUNNEL_ID>.json) ist ein Secret: bleibt in ~/.cloudflared, nie im Repo.
+# Template for the service user's ~/.cloudflared/config.yml.
+# The credentials file (<TUNNEL_ID>.json) is a secret: it stays in ~/.cloudflared, never in the repo.
 tunnel: __TUNNEL_ID__
 credentials-file: __HOME__/.cloudflared/__TUNNEL_ID__.json
 ingress:

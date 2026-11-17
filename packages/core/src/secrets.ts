@@ -18,7 +18,7 @@ export const SECRET_PATTERNS: SecretPattern[] = [
   { name: "AWS-Access-Key", regex: /\bAKIA[0-9A-Z]{16}\b/ },
   { name: "GitHub-Token", regex: /\bgh[pousr]_[A-Za-z0-9]{36,}\b/ },
   {
-    name: "Zugewiesenes Secret (KEY=wert)",
+    name: "Assigned secret (KEY=value)",
     regex: /\b(?:TELEGRAM_BOT_TOKEN|ANTHROPIC_API_KEY|OPENAI_API_KEY|ELEVENLABS_API_KEY|TUNNEL_TOKEN)\s*[=:]\s*["']?[A-Za-z0-9_:\-]{16,}/,
   },
 ];
@@ -56,9 +56,9 @@ export function isForbiddenFile(path: string): boolean {
 export class SecretLeakError extends Error {
   constructor(where: string, findings: SecretFinding[]) {
     super(
-      `Secret-Muster gefunden in ${where}: ${findings
-        .map((f) => `${f.pattern} (Zeile ${f.line})`)
-        .join(", ")}. Schreiben abgebrochen.`,
+      `Secret pattern found in ${where}: ${findings
+        .map((f) => `${f.pattern} (line ${f.line})`)
+        .join(", ")}. Not written.`,
     );
     this.name = "SecretLeakError";
   }

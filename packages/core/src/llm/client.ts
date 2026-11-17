@@ -1,6 +1,6 @@
 /**
- * Schmale Schnittstelle zu Claude. Der Rest des Codes kennt nur LlmClient,
- * damit Tests ohne echte API-Aufrufe laufen (FakeLlm in den Tests).
+ * Thin interface to Claude. The rest of the code only knows LlmClient,
+ * so tests run without real API calls (FakeLlm in the tests).
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
@@ -19,8 +19,8 @@ export interface LlmUsage {
 }
 
 export interface StructuredRequest<T> {
-  /** wofür (Logging, Kosten) */
-  purpose: "analyse" | "digest" | "briefing";
+  /** what for (logging, costs) */
+  purpose: "analysis" | "digest" | "brief";
   model: string;
   system: string;
   content: LlmContent[];
@@ -57,21 +57,21 @@ export class AnthropicLlm implements LlmClient {
       const msg = await this.client.beta.messages.parse({
         model: req.model,
         max_tokens: req.maxTokens ?? 16000,
-        // Systemprompt mit Brand Guide ist stabil -> cachen
+        // the system prompt with the guide is stable -> cache it
         system: [{ type: "text", text: req.system, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content }],
         output_config: { format: betaZodOutputFormat(req.schema), effort: req.effort ?? "medium" },
-        // bei einer Ablehnung durch Sicherheitsklassifikatoren übernimmt serverseitig ein Ersatzmodell
+        // if a safety classifier declines, a fallback model takes over on the server
         betas: ["server-side-fallback-2026-07-01"],
         fallbacks: "default",
       });
       if (msg.stop_reason === "refusal") {
-        throw new LlmError("Claude hat die Anfrage abgelehnt (refusal).");
+        throw new LlmError("Claude declined the request (refusal).");
       }
       if (msg.stop_reason === "max_tokens") {
-        throw new LlmError("Antwort abgeschnitten (max_tokens).", true);
+        throw new LlmError("Response cut off (max_tokens).", true);
       }
-      if (msg.parsed_output == null) throw new LlmError("Antwort entsprach nicht dem Schema.", true);
+      if (msg.parsed_output == null) throw new LlmError("Response did not match the schema.", true);
       return {
         data: msg.parsed_output as T,
         usage: {
@@ -84,23 +84,23 @@ export class AnthropicLlm implements LlmClient {
       };
     } catch (err) {
       if (err instanceof LlmError) throw err;
-      if (err instanceof Anthropic.RateLimitError) throw new LlmError("Claude: Rate-Limit erreicht, später erneut versuchen.", true);
-      if (err instanceof Anthropic.AuthenticationError) throw new LlmError("Claude: API-Key ungültig.");
-      if (err instanceof Anthropic.BadRequestError) throw new LlmError(`Claude: ungültige Anfrage (${err.message}).`);
-      if (err instanceof Anthropic.APIConnectionError) throw new LlmError("Claude: keine Verbindung.", true);
-      if (err instanceof Anthropic.APIError) throw new LlmError(`Claude: API-Fehler ${err.status ?? ""}.`, true);
+      if (err instanceof Anthropic.RateLimitError) throw new LlmError("Claude: rate limit reached, try again later.", true);
+      if (err instanceof Anthropic.AuthenticationError) throw new LlmError("Claude: invalid API key.");
+      if (err instanceof Anthropic.BadRequestError) throw new LlmError(`Claude: invalid request (${err.message}).`);
+      if (err instanceof Anthropic.APIConnectionError) throw new LlmError("Claude: no connection.", true);
+      if (err instanceof Anthropic.APIError) throw new LlmError(`Claude: API error ${err.status ?? ""}.`, true);
       throw err;
     }
   }
 }
 
-/** Grobe Kostenrechnung in USD (Preise je 1 Mio. Tokens, Stand 11/2026, bitte bei Bedarf aktualisieren). */
+/** Rough cost in USD (prices per million tokens, as of 11/2026; update when needed). */
 export const PREISE_USD_PRO_MIO: Record<string, { input: number; output: number; cacheRead: number; cacheWrite: number }> = {
   "claude-sonnet-5-5": { input: 2, output: 10, cacheRead: 0.1, cacheWrite: 2.5 },
   "claude-opus-5-5": { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 },
 };
 
-export function kostenUsd(u: LlmUsage): number | undefined {
+export function costUsd(u: LlmUsage): number | undefined {
   const key = Object.keys(PREISE_USD_PRO_MIO).find((k) => u.model.startsWith(k));
   if (!key) return undefined;
   const p = PREISE_USD_PRO_MIO[key];

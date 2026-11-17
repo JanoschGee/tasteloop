@@ -1,10 +1,10 @@
 /**
- * Moodboard als Obsidian-Canvas (JSON Canvas 1.0). Pro Ebene eine Gruppe,
- * jedes Bild ein Datei-Knoten. Vom Menschen verschobene oder ergänzte Knoten
- * bleiben unangetastet; der Code verwaltet nur Knoten mit id "upl-<id>".
+ * Moodboard as an Obsidian canvas (JSON Canvas 1.0). One group per level,
+ * one file node per image. Nodes people moved or added stay untouched;
+ * the code only manages nodes with id "upl-<id>".
  */
 import type { Vault } from "./vault";
-import { EBENEN_LABEL, type EbeneOderOffen } from "./uploads";
+import { LEVEL_LABEL, type LevelOrOpen } from "./uploads";
 
 interface CanvasNode {
   id: string;
@@ -30,7 +30,7 @@ const CELL = 280;
 const IMG = 250;
 const PAD = 40;
 const GROUP_GAP = 120;
-const ORDER: EbeneOderOffen[] = ["brand", "kampagne", "merken", "offen"];
+const ORDER: LevelOrOpen[] = ["brand", "campaign", "keep", "open"];
 
 function groupX(i: number) {
   return i * (COLS * CELL + PAD * 2 + GROUP_GAP);
@@ -41,7 +41,7 @@ export function emptyCanvas(): CanvasDoc {
     nodes: ORDER.map((e, i) => ({
       id: `grp-${e}`,
       type: "group" as const,
-      label: EBENEN_LABEL[e],
+      label: LEVEL_LABEL[e],
       x: groupX(i),
       y: 0,
       width: COLS * CELL + PAD * 2,
@@ -60,18 +60,18 @@ function readCanvas(v: Vault): CanvasDoc {
     doc.edges ??= [];
     return doc;
   } catch {
-    // kaputtes Canvas nicht überschreiben, sondern sichern
-    const backup = `${p}.defekt-${Date.now()}.json`;
+    // never overwrite a broken canvas: keep a copy
+    const backup = `${p}.broken-${Date.now()}.json`;
     v.writeText(backup, v.readText(p));
     return emptyCanvas();
   }
 }
 
-function ensureGroup(doc: CanvasDoc, ebene: EbeneOderOffen): CanvasNode {
-  let g = doc.nodes.find((n) => n.id === `grp-${ebene}`);
+function ensureGroup(doc: CanvasDoc, level: LevelOrOpen): CanvasNode {
+  let g = doc.nodes.find((n) => n.id === `grp-${level}`);
   if (!g) {
-    const i = ORDER.indexOf(ebene);
-    g = { id: `grp-${ebene}`, type: "group", label: EBENEN_LABEL[ebene], x: groupX(i), y: 0, width: COLS * CELL + PAD * 2, height: CELL + PAD * 2 };
+    const i = ORDER.indexOf(level);
+    g = { id: `grp-${level}`, type: "group", label: LEVEL_LABEL[level], x: groupX(i), y: 0, width: COLS * CELL + PAD * 2, height: CELL + PAD * 2 };
     doc.nodes.unshift(g);
   }
   return g;
@@ -97,16 +97,16 @@ function placeInGroup(doc: CanvasDoc, g: CanvasNode, node: CanvasNode) {
   }
 }
 
-/** Fügt das Bild hinzu oder verschiebt es in die Gruppe seiner (neuen) Ebene. */
-export function upsertCanvasImage(v: Vault, id: string, bild: string, ebene: EbeneOderOffen): void {
+/** Adds the image or moves it into the group of its (new) level. */
+export function upsertCanvasImage(v: Vault, id: string, image: string, level: LevelOrOpen): void {
   const doc = readCanvas(v);
-  const g = ensureGroup(doc, ebene);
+  const g = ensureGroup(doc, level);
   let node = doc.nodes.find((n) => n.id === `upl-${id}`);
   if (node && inside(node, g)) {
-    node.file = bild;
+    node.file = image;
   } else {
     if (!node) {
-      node = { id: `upl-${id}`, type: "file", file: bild, x: 0, y: 0, width: IMG, height: IMG };
+      node = { id: `upl-${id}`, type: "file", file: image, x: 0, y: 0, width: IMG, height: IMG };
       doc.nodes.push(node);
     }
     placeInGroup(doc, g, node);

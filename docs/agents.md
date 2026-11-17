@@ -7,9 +7,9 @@ Tasteloop has no API of its own. Your agents read plain files from your vault: t
 | File | When |
 |---|---|
 | `Brand/Brand Guide.md` | always. Part 1 is binding, Part 2 is the current expression. |
-| `<ordner>/Briefings/<id> Briefing.md` | for a campaign |
-| `<ordner>/Uploads/*.md` | if the agent should look at concrete references (each note links its image) |
-| `<ordner>/Änderungslog.md` and Part 4 of the guide | to see what changed recently and why |
+| `<folder>/Briefs/<id> Brief.md` | for a campaign |
+| `<folder>/Uploads/*.md` | if the agent should look at concrete references (each note links its image) |
+| `<folder>/Changelog.md` and Part 4 of the guide | to see what changed recently and why |
 
 ## Claude Code
 
@@ -31,7 +31,7 @@ Before you write copy, design anything or create image prompts for Your Brand, r
 - Part 2 (Expression) is the current style. Follow it unless the user says otherwise.
 - For image prompts, compose them from the blocks in "2.5 Prompt building blocks" and use the
   block text word for word. Check the result against "2.6 Review checklist".
-- For a campaign, read the brief in `/path/to/vault/Brand/Tasteloop/Briefings/` that the user names.
+- For a campaign, read the brief in `/path/to/vault/Brand/Tasteloop/Briefs/` that the user names.
   Take the style of the reference, never its motifs, claims, people or layout.
 - If something is not covered by the guide, say so instead of guessing, and suggest a reference
   the team could add.

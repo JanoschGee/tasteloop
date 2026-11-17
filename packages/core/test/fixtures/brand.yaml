@@ -1,27 +1,27 @@
-marke:
-  id: testmarke
-  name: Testmarke
+brand:
+  id: testbrand
+  name: Testbrand
 telegram:
   chat_id: -1001234567890
-  absender:
+  senders:
     "111": Anna
     "222": Ben
     "333": Cem
 vault:
-  wurzel: /wird/im/test/ersetzt
-  ordner: "Marke/Brand-System"
-brand_guide:
-  datei: "Marke/Brand Guide.md"
-  gesperrte_abschnitte:
-    - Leitgedanke
-    - "1. Marke"
-    - Was wir nie sagen
-  analyse_kontext:
+  root: /replaced/in/test
+  folder: "Brand/Tasteloop"
+guide:
+  file: "Brand/Brand Guide.md"
+  locked:
+    - Purpose
+    - "1. Brand"
+    - What we never say
+  analysis_context:
     - "3. Look and Feel"
-freigebende:
+approvers:
   - Anna
-transkription:
-  lokal:
-    aktiv: false
+transcription:
+  local:
+    enabled: false
   api:
-    aktiv: false
+    enabled: false

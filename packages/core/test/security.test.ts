@@ -1,4 +1,4 @@
-/** Secrets nie in Repo oder Vault, Config strikt, Vault-Schreibschutz, Markenneutralität. */
+/** Secrets never in repo or vault, strict config, vault write guard, brand neutrality, public part. */
 import { mkdtempSync, writeFileSync, chmodSync, mkdirSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -57,31 +57,31 @@ describe("Vault-Schreibschutz", () => {
   });
   it("schreibt nur im Brand-Ordner, in den Guide und in den Papierkorb", () => {
     const { vault } = makeVault();
-    expect(() => vault.writeText("Fremd.md", "x")).toThrow(VaultPathError);
-    expect(() => vault.writeText("Marke/anderes.md", "x")).toThrow(VaultPathError);
+    expect(() => vault.writeText("Private.md", "x")).toThrow(VaultPathError);
+    expect(() => vault.writeText("Brand/other.md", "x")).toThrow(VaultPathError);
     expect(() => vault.writeText("../ausserhalb.md", "x")).toThrow(VaultPathError);
-    expect(() => vault.writeText(vault.rel("../../Fremd.md"), "x")).toThrow(VaultPathError);
+    expect(() => vault.writeText(vault.rel("../../Private.md"), "x")).toThrow(VaultPathError);
     expect(() => vault.writeText(vault.rel("Uploads/ok.md"), "x")).not.toThrow();
-    expect(() => vault.writeText("Marke/Brand Guide.md", "# x\n")).not.toThrow();
+    expect(() => vault.writeText("Brand/Brand Guide.md", "# x\n")).not.toThrow();
   });
 });
 
 describe("Marken-Config", () => {
   it("lehnt Secrets in der YAML ab", () => {
-    const yaml = fixture("brand.yaml").replace("/wird/im/test/ersetzt", "/tmp/v") + `\nweb:\n  url: https://x.example\n# ${fakeAnthropic}\n`;
+    const yaml = fixture("brand.yaml").replace("/replaced/in/test", "/tmp/v") + `\nweb:\n  url: https://x.example\n# ${fakeAnthropic}\n`;
     expect(() => parseBrandConfig(yaml)).toThrow(/Secret/);
   });
   it("lehnt unbekannte Schlüssel ab (z. B. token)", () => {
-    const yaml = fixture("brand.yaml").replace("/wird/im/test/ersetzt", "/tmp/v").replace("telegram:\n", "telegram:\n  token: abc\n");
+    const yaml = fixture("brand.yaml").replace("/replaced/in/test", "/tmp/v").replace("telegram:\n", "telegram:\n  token: abc\n");
     expect(() => parseBrandConfig(yaml)).toThrow(ConfigError);
   });
   it("verlangt relative Pfade ohne ..", () => {
-    const yaml = fixture("brand.yaml").replace("/wird/im/test/ersetzt", "/tmp/v").replace('ordner: "Marke/Brand-System"', 'ordner: "../raus"');
-    expect(() => parseBrandConfig(yaml)).toThrow(/relativ/);
+    const yaml = fixture("brand.yaml").replace("/replaced/in/test", "/tmp/v").replace('folder: "Brand/Tasteloop"', 'folder: "../outside"');
+    expect(() => parseBrandConfig(yaml)).toThrow(/relative/);
   });
   it("die Beispiel-Config im Repo ist gültig", () => {
     const cfg = parseBrandConfig(readFileSync(join(REPO, "brands", "example.yaml"), "utf8"));
-    expect(cfg.brand_guide.lernbereich.length + cfg.brand_guide.gesperrte_abschnitte.length).toBeGreaterThan(0);
+    expect(cfg.guide.learning.length + cfg.guide.locked.length).toBeGreaterThan(0);
   });
 });
 
@@ -100,11 +100,12 @@ describe("Secrets laden", () => {
     const vault = mkdtempSync(join(tmpdir(), "ab-vault-env-"));
     mkdirSync(join(vault, "sub"));
     writeFileSync(join(vault, "sub", ".env"), "X=1\n");
-    expect(() => loadSecrets({ env: { TASTELOOP_ENV_FILE: join(vault, "sub", ".env") }, repoRoot: REPO, vaultRoot: vault })).toThrow(/im Repo oder im Vault/);
+    expect(() => loadSecrets({ env: { TASTELOOP_ENV_FILE: join(vault, "sub", ".env") }, repoRoot: REPO, vaultRoot: vault })).toThrow(/inside the repo or the vault/);
   });
 });
 
 describe("Öffentlicher Teil", () => {
+  // im öffentlichen Export fehlt docs/internal, dann gibt es keine Sperrliste
   it.skipIf(!existsSync(join(REPO, "docs/internal/public-blocklist.txt")))("enthält keine internen Namen, Kunden oder Hosts (Sperrliste in docs/internal)", () => {
     const r = checkPublic(REPO);
     expect(r).toBeDefined();
@@ -117,7 +118,7 @@ describe("Öffentlicher Teil", () => {
     writeFileSync(join(dir, "docs/internal/public-blocklist.txt"), "# Kommentar\ngeheimkunde\n");
     writeFileSync(join(dir, "docs/internal/notiz.md"), "geheimkunde intern ist ok\n");
     writeFileSync(join(dir, "README.md"), "Hallo\nFür GeheimKunde gebaut\n");
-    expect(checkPublic(dir)).toEqual(["README.md:2: enthält „geheimkunde“"]);
+    expect(checkPublic(dir)).toEqual(['README.md:2: contains "geheimkunde"']);
     // Erlaubt-Liste und ausgenommene Datei
     writeFileSync(join(dir, "docs/internal/public-blocklist.txt"), "geheimkunde\nallow: github.com/geheimkunde/repo\nfile: legal/imprint.html\n");
     mkdirSync(join(dir, "legal"));
@@ -125,7 +126,7 @@ describe("Öffentlicher Teil", () => {
     writeFileSync(join(dir, "README.md"), "Code: https://github.com/GeheimKunde/repo\n");
     expect(checkPublic(dir)).toEqual([]);
     writeFileSync(join(dir, "README.md"), "Code: https://github.com/GeheimKunde/anderes\n");
-    expect(checkPublic(dir)).toEqual(["README.md:1: enthält „geheimkunde“"]);
+    expect(checkPublic(dir)).toEqual(['README.md:1: contains "geheimkunde"']);
   });
   it("die Lizenz ist MIT", () => {
     expect(readFileSync(join(REPO, "LICENSE"), "utf8")).toMatch(/^MIT License\n\nCopyright \(c\) 2026 Tasteloop contributors/);
@@ -135,7 +136,8 @@ describe("Öffentlicher Teil", () => {
 
 describe("Markenneutralität", () => {
   it("Code und UI enthalten keinen Markennamen aus brands/*.yaml", () => {
-    // Im öffentlichen Repo gibt es nur brands/example.yaml, dann kann die Liste leer sein.
+    // im öffentlichen Repo gibt es nur example.yaml, die Liste kann leer sein
+    expect(Array.isArray(brandTerms(REPO))).toBe(true);
     expect(checkNeutral(REPO)).toEqual([]);
   });
 });

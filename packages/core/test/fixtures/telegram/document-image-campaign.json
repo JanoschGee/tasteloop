@@ -5,7 +5,7 @@
     "date": 1762950200,
     "chat": { "id": -1001234567890, "type": "supergroup" },
     "from": { "id": 222, "first_name": "Ben" },
-    "caption": "So eine Anzeige wollen wir auch für die Kampagne im Dezember",
+    "caption": "We want an ad like this for the December campaign",
     "document": { "file_id": "doc-1", "file_name": "ad.PNG", "mime_type": "image/png" }
   }
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { PencilCircle } from "./pencil-circle";
 
-/** Kleines Etikett: Tinte auf Papier, keine Farbe. */
+/** Small label: ink on paper, no colour. */
 export function Pill({ children, tone = "neutral", className }: { children: React.ReactNode; tone?: "neutral" | "dark" | "outline" | "pencil"; className?: string }) {
   return (
     <span
@@ -20,7 +20,7 @@ export function Pill({ children, tone = "neutral", className }: { children: Reac
   );
 }
 
-/** Filter: der aktive Filter ist mit Rotstift umkreist. */
+/** Filter: the active filter is circled in red pencil. */
 export function FilterLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
   return (
     <Link href={href} className={cn("relative px-2.5 py-1 text-sm transition-colors", active ? "text-[var(--ink)]" : "text-[var(--muted)] hover:text-[var(--ink)]")}>

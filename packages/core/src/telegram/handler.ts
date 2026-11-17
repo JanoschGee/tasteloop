@@ -1,29 +1,34 @@
 /**
- * Verarbeitung der Telegram-Updates.
+ * Handling of Telegram updates.
  *
- * Ablauf:
- *  1. Bild (Foto oder Bild-Datei) in der Gruppe -> Bild + Notiz im Vault (ebene: offen),
- *     Bot antwortet mit Knöpfen Brand / Kampagne / Nur merken (Vorschlag markiert).
- *  2. Sprachnachricht als Antwort auf das Bild oder die Bot-Bestätigung (oder kurz danach
- *     vom selben Absender) -> Transkript in die Notiz, Vorschlag aktualisieren.
- *  3. Knopf -> Ebene setzen, Claude-Analyse, Moodboard, bei Kampagne Briefing.
- *     Knöpfe bleiben stehen: erneut tippen ändert die Ebene.
- *  4. Text-Antwort auf Bild/Bestätigung -> Korrektur (wird in die Notiz geschrieben, Analyse neu).
- *  5. „/löschen“ als Antwort -> Notiz, Bild, Briefing in den Obsidian-Papierkorb, raus aus dem Moodboard.
+ * Flow:
+ *  1. Image (photo or image file) in the group -> image + note in the vault (level: open),
+ *     the bot replies with the buttons Brand / Campaign / Just keep (suggestion marked).
+ *  2. Voice note as a reply to the image or the bot's message (or shortly after, same sender)
+ *     -> transcript into the note, suggestion updated.
+ *  3. Button -> set level, Claude analysis, moodboard, brief for campaigns.
+ *     The buttons stay: tapping again changes the level.
+ *  4. Text reply to the image or the bot's message -> correction (stored, analysis runs again).
+ *  5. "/delete" as a reply -> note, image and brief go to Obsidian's trash, image leaves the moodboard.
  */
 import { extname } from "node:path";
-import { suggestLevel, DEFAULT_STICHWORTE } from "../level";
+import { analyseUpload } from "../jobs/analyse";
+import { DEFAULT_KEYWORDS, suggestLevel } from "../level";
 import type { Services } from "../services";
 import type { BotState } from "../state";
 import { localIso, newUploadId } from "../util";
 import { removeCanvasImage, upsertCanvasImage } from "../vault/canvas";
-import { EBENEN, EBENEN_LABEL, readUpload, uploadNotePath, writeUpload, type Ebene, type Upload } from "../vault/uploads";
-import { analyseUpload } from "../jobs/analyse";
+import { LEVELS, LEVEL_LABEL, readUpload, uploadNotePath, writeUpload, type Level, type Upload } from "../vault/uploads";
 import type { InlineKeyboard, TelegramApi, TgCallbackQuery, TgMessage, TgUpdate } from "./api";
 
-const DELETE_CMD = /^\/(l(ö|oe|o)schen|delete)(@\w+)?\s*$/i;
-const HELP_CMD = /^\/(hilfe|help|start)(@\w+)?\s*$/i;
+const DELETE_CMD = /^\/(delete|l(ö|oe|o)schen)(@\w+)?\s*$/i;
+const HELP_CMD = /^\/(help|start|hilfe)(@\w+)?\s*$/i;
 const IMAGE_EXT = /\.(jpe?g|png|webp|gif)$/i;
+/** button data from messages sent before the switch to English */
+const LEGACY_LEVEL: Record<string, Level> = { kampagne: "campaign", merken: "keep" };
+
+export const HELP_TEXT =
+  "How it works: send an image and give the reason as a caption or as a voice note (reply to the image). Then pick a level: Brand, Campaign or Just keep. Reply to my message with text to correct it, or with /delete to remove it.";
 
 export class TelegramHandler {
   constructor(
@@ -36,38 +41,40 @@ export class TelegramHandler {
     return this.svc.cfg.telegram.chat_id;
   }
 
+  private get keywords() {
+    return this.svc.cfg.level_keywords ?? DEFAULT_KEYWORDS;
+  }
+
   senderName(user?: { id: number; first_name?: string; username?: string }): string | undefined {
     if (!user) return undefined;
-    const known = this.svc.cfg.telegram.absender[String(user.id)];
+    const known = this.svc.cfg.telegram.senders[String(user.id)];
     if (known) return known;
-    if (this.svc.cfg.telegram.nur_bekannte_absender) return undefined;
+    if (this.svc.cfg.telegram.known_senders_only) return undefined;
     return user.first_name || user.username || String(user.id);
   }
 
-  keyboard(id: string, u: Pick<Upload, "ebene" | "vorgeschlageneEbene">): InlineKeyboard {
+  keyboard(id: string, u: Pick<Upload, "level" | "suggestedLevel">): InlineKeyboard {
     return [
-      EBENEN.map((e) => {
-        const mark = u.ebene === e ? "✅ " : u.ebene === "offen" && u.vorgeschlageneEbene === e ? "👉 " : "";
-        return { text: `${mark}${EBENEN_LABEL[e]}`, callback_data: `lvl:${id}:${e}` };
+      LEVELS.map((e) => {
+        const mark = u.level === e ? "✅ " : u.level === "open" && u.suggestedLevel === e ? "👉 " : "";
+        return { text: `${mark}${LEVEL_LABEL[e]}`, callback_data: `lvl:${id}:${e}` };
       }),
     ];
   }
 
   statusText(u: Upload, extra?: string): string {
-    const lines = [`Erfasst: ${u.id} (von ${u.absender})`];
-    if (u.ebene === "offen") {
-      lines.push(u.vorgeschlageneEbene ? `Vorschlag: ${EBENEN_LABEL[u.vorgeschlageneEbene]}. Bitte Ebene wählen.` : "Welche Ebene?");
+    const lines = [`Saved: ${u.id} (from ${u.sender})`];
+    if (u.level === "open") {
+      lines.push(u.suggestedLevel ? `Suggestion: ${LEVEL_LABEL[u.suggestedLevel]}. Please pick a level.` : "Which level?");
     } else {
-      lines.push(`Ebene: ${EBENEN_LABEL[u.ebene]}`);
+      lines.push(`Level: ${LEVEL_LABEL[u.level]}`);
     }
-    if (u.transkript.length) lines.push(`🎙 Transkript: ${u.transkript.join(" ").slice(0, 300)}`);
-    if (u.status === "analysiert" || u.status === "im-digest") {
-      if (u.analyse) lines.push(`🔎 ${u.analyse.kurzbeschreibung.slice(0, 300)}`);
-    }
-    if (u.status === "fehler" && u.fehler) lines.push(`⚠️ ${u.fehler.slice(0, 200)} Zum Wiederholen Ebene erneut antippen.`);
-    if (u.briefing) lines.push(`📝 Briefing: ${u.briefing.split("/").pop()?.replace(/\.md$/, "")}`);
+    if (u.transcript.length) lines.push(`🎙 Transcript: ${u.transcript.join(" ").slice(0, 300)}`);
+    if ((u.status === "analyzed" || u.status === "in_digest") && u.analysis) lines.push(`🔎 ${u.analysis.summary.slice(0, 300)}`);
+    if (u.status === "error" && u.error) lines.push(`⚠️ ${u.error.slice(0, 200)} Tap the level again to retry.`);
+    if (u.brief) lines.push(`📝 Brief: ${u.brief.split("/").pop()?.replace(/\.md$/, "")}`);
     if (extra) lines.push(extra);
-    lines.push("Antwort mit Text = Korrektur, mit /löschen = entfernen.");
+    lines.push("Reply with text to correct, with /delete to remove.");
     return lines.join("\n");
   }
 
@@ -77,22 +84,22 @@ export class TelegramHandler {
     try {
       await this.tg.editMessageText(ref.chatId, ref.botMessageId, this.statusText(u, extra), this.keyboard(u.id, u));
     } catch (err) {
-      this.svc.log.warn("Bot-Nachricht nicht aktualisiert", { id: u.id, fehler: String(err) });
+      this.svc.log.warn("Bot message not updated", { id: u.id, error: String(err) });
     }
   }
 
-  /** Verarbeitet ein Update. Wirft nicht (Fehler werden geloggt und, wo sinnvoll, im Chat gemeldet). */
+  /** Handles one update. Never throws (errors are logged and, where useful, reported in the chat). */
   async handleUpdate(update: TgUpdate): Promise<void> {
     if (!this.state.markUpdate(update.update_id)) return;
     try {
       if (update.callback_query) await this.onCallback(update.callback_query);
       else if (update.message) await this.onMessage(update.message);
     } catch (err) {
-      this.svc.log.error("Update-Verarbeitung fehlgeschlagen", { update: update.update_id, fehler: err instanceof Error ? err.stack : String(err) });
+      this.svc.log.error("Update failed", { update: update.update_id, error: err instanceof Error ? err.stack : String(err) });
       const chat = update.message?.chat.id ?? update.callback_query?.message?.chat.id;
       if (chat === this.chatId) {
         await this.tg
-          .sendMessage(this.chatId, `⚠️ Das hat nicht geklappt: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500), {
+          .sendMessage(this.chatId, `⚠️ That didn't work: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500), {
             replyTo: update.message?.message_id,
           })
           .catch(() => {});
@@ -110,38 +117,34 @@ export class TelegramHandler {
 
   async onMessage(msg: TgMessage): Promise<void> {
     if (msg.chat.id !== this.chatId) {
-      this.svc.log.warn("Nachricht aus fremdem Chat ignoriert", { chat: msg.chat.id });
+      this.svc.log.warn("Message from another chat ignored", { chat: msg.chat.id });
       return;
     }
     if (msg.from?.is_bot) return;
-    const absender = this.senderName(msg.from);
-    if (!absender) {
-      this.svc.log.warn("Unbekannter Absender ignoriert", { user: msg.from?.id });
+    const sender = this.senderName(msg.from);
+    if (!sender) {
+      this.svc.log.warn("Unknown sender ignored", { user: msg.from?.id });
       return;
     }
     const text = (msg.text ?? "").trim();
 
     if (HELP_CMD.test(text)) {
-      await this.tg.sendMessage(
-        this.chatId,
-        "So geht's: Bild schicken, Begründung als Bildunterschrift oder als Sprachnachricht (Antwort auf das Bild). Dann Ebene wählen: Brand, Kampagne oder Nur merken. Antwort auf meine Bestätigung mit Text = Korrektur, mit /löschen = entfernen.",
-        { replyTo: msg.message_id },
-      );
+      await this.tg.sendMessage(this.chatId, HELP_TEXT, { replyTo: msg.message_id });
       return;
     }
 
     const image = this.imageOf(msg);
-    if (image) return this.onImage(msg, absender, image);
+    if (image) return this.onImage(msg, sender, image);
 
     if (DELETE_CMD.test(text)) return this.onDelete(msg);
 
-    if (msg.voice || msg.audio) return this.onVoice(msg, absender);
+    if (msg.voice || msg.audio) return this.onVoice(msg, sender);
 
     if (text && msg.reply_to_message) {
       const id = this.resolveUploadId(msg.reply_to_message);
-      if (id && !text.startsWith("/")) return this.onCorrection(msg, absender, id, text);
+      if (id && !text.startsWith("/")) return this.onCorrection(msg, sender, id, text);
     }
-    // sonstige Nachrichten (Unterhaltung in der Gruppe) ignorieren
+    // anything else (conversation in the group) is ignored
   }
 
   private imageOf(msg: TgMessage): { fileId: string; ext: string } | undefined {
@@ -157,50 +160,48 @@ export class TelegramHandler {
     return undefined;
   }
 
-  async onImage(msg: TgMessage, absender: string, image: { fileId: string; ext: string }) {
+  async onImage(msg: TgMessage, sender: string, image: { fileId: string; ext: string }) {
     const v = this.svc.vault;
     const now = this.svc.now();
     let id = newUploadId(now);
     while (v.exists(uploadNotePath(v, id))) id = newUploadId(now);
     const file = await this.tg.downloadFile(image.fileId);
-    const bild = `${v.dirs.bilder}/${id}${image.ext}`;
-    v.writeBytes(bild, file.data);
-    const begruendung = (msg.caption ?? "").trim();
+    const imagePath = `${v.dirs.images}/${id}${image.ext}`;
+    v.writeBytes(imagePath, file.data);
+    const why = (msg.caption ?? "").trim();
     const u: Upload = {
       id,
-      marke: this.svc.cfg.marke.name,
-      ebene: "offen",
-      vorgeschlageneEbene: suggestLevel(begruendung, this.svc.cfg.ebenen_stichworte ?? DEFAULT_STICHWORTE),
-      absender,
-      datum: localIso(now),
-      status: "neu",
-      bild,
-      begruendung,
-      transkript: [],
-      korrekturen: [],
-      telegramNachricht: msg.message_id,
+      brand: this.svc.cfg.brand.name,
+      level: "open",
+      suggestedLevel: suggestLevel(why, this.keywords),
+      sender,
+      date: localIso(now),
+      status: "new",
+      image: imagePath,
+      why,
+      transcript: [],
+      corrections: [],
+      messageId: msg.message_id,
       extraSections: [],
     };
     writeUpload(v, u);
-    upsertCanvasImage(v, id, bild, "offen");
+    upsertCanvasImage(v, id, imagePath, "open");
     this.state.data.uploads[id] = { chatId: msg.chat.id, photoMessageId: msg.message_id, senderId: msg.from!.id, createdAt: now.getTime() };
     this.state.link(msg.chat.id, msg.message_id, id);
     const sent = await this.tg.sendMessage(this.chatId, this.statusText(u), { replyTo: msg.message_id, keyboard: this.keyboard(id, u) });
     this.state.data.uploads[id].botMessageId = sent.message_id;
     this.state.link(msg.chat.id, sent.message_id, id);
-    this.svc.log.info("Upload erfasst", { id, absender });
+    this.svc.log.info("Upload saved", { id, sender });
   }
 
-  async onVoice(msg: TgMessage, absender: string) {
+  async onVoice(msg: TgMessage, sender: string) {
     const now = this.svc.now().getTime();
     let id = this.resolveUploadId(msg.reply_to_message);
     if (!id && msg.from) {
-      id = this.state.lastUploadOf(msg.chat.id, msg.from.id, now, this.svc.cfg.telegram.zuordnung_minuten * 60_000);
+      id = this.state.lastUploadOf(msg.chat.id, msg.from.id, now, this.svc.cfg.telegram.attach_minutes * 60_000);
     }
     if (!id) {
-      await this.tg.sendMessage(this.chatId, "Zu welchem Bild gehört das? Bitte die Sprachnachricht als Antwort auf das Bild schicken.", {
-        replyTo: msg.message_id,
-      });
+      await this.tg.sendMessage(this.chatId, "Which image is this for? Please send the voice note as a reply to the image.", { replyTo: msg.message_id });
       return;
     }
     const u = readUpload(this.svc.vault, id);
@@ -212,50 +213,48 @@ export class TelegramHandler {
     try {
       const r = await this.svc.transcriber.transcribe(file.data, name);
       text = r.text;
-      this.svc.log.info("Transkribiert", { id, engine: r.engine, zeichen: text.length });
+      this.svc.log.info("Transcribed", { id, engine: r.engine, chars: text.length });
     } catch (err) {
-      await this.tg.sendMessage(this.chatId, `⚠️ Sprachnachricht konnte nicht transkribiert werden. Bitte als Text antworten.`, {
-        replyTo: msg.message_id,
-      });
-      this.svc.log.error("Transkription fehlgeschlagen", { id, fehler: String(err) });
+      await this.tg.sendMessage(this.chatId, "⚠️ The voice note could not be transcribed. Please reply with text instead.", { replyTo: msg.message_id });
+      this.svc.log.error("Transcription failed", { id, error: String(err) });
       return;
     }
     this.state.link(msg.chat.id, msg.message_id, id);
-    u.transkript.push(absender === u.absender ? text : `${absender}: ${text}`);
-    if (u.ebene === "offen") {
-      u.vorgeschlageneEbene = suggestLevel([u.begruendung, ...u.transkript].join(" "), this.svc.cfg.ebenen_stichworte ?? DEFAULT_STICHWORTE) ?? u.vorgeschlageneEbene;
+    u.transcript.push(sender === u.sender ? text : `${sender}: ${text}`);
+    if (u.level === "open") {
+      u.suggestedLevel = suggestLevel([u.why, ...u.transcript].join(" "), this.keywords) ?? u.suggestedLevel;
       writeUpload(this.svc.vault, u);
       await this.refreshBotMessage(u);
     } else {
       writeUpload(this.svc.vault, u);
-      await this.reanalyse(u.id, "Transkript ergänzt, Analyse aktualisiert.");
+      await this.reanalyse(u.id, "Transcript added, analysis updated.");
     }
   }
 
-  async onCorrection(msg: TgMessage, absender: string, id: string, text: string) {
+  async onCorrection(msg: TgMessage, sender: string, id: string, text: string) {
     const u = readUpload(this.svc.vault, id);
     if (!u) return;
-    u.korrekturen.push({ zeit: localIso(this.svc.now()), absender, text });
+    u.corrections.push({ time: localIso(this.svc.now()), sender, text });
     writeUpload(this.svc.vault, u);
     this.state.link(msg.chat.id, msg.message_id, id);
-    if (u.ebene === "offen") {
-      await this.refreshBotMessage(u, "✏️ Korrektur notiert.");
+    if (u.level === "open") {
+      await this.refreshBotMessage(u, "✏️ Correction noted.");
     } else {
-      await this.reanalyse(id, "✏️ Korrektur notiert, Analyse aktualisiert.");
+      await this.reanalyse(id, "✏️ Correction noted, analysis updated.");
     }
   }
 
   async onDelete(msg: TgMessage) {
     const id = this.resolveUploadId(msg.reply_to_message);
     if (!id) {
-      await this.tg.sendMessage(this.chatId, "Bitte /löschen als Antwort auf das Bild oder auf meine Bestätigung schicken.", { replyTo: msg.message_id });
+      await this.tg.sendMessage(this.chatId, "Please send /delete as a reply to the image or to my message.", { replyTo: msg.message_id });
       return;
     }
     const v = this.svc.vault;
     const u = readUpload(v, id);
     const moved: string[] = [];
     if (u) {
-      for (const p of [uploadNotePath(v, id), u.bild, u.briefing].filter((x): x is string => !!x)) {
+      for (const p of [uploadNotePath(v, id), u.image, u.brief].filter((x): x is string => !!x)) {
         const t = v.trash(p);
         if (t) moved.push(t);
       }
@@ -264,42 +263,43 @@ export class TelegramHandler {
     const ref = this.state.data.uploads[id];
     this.state.forget(id);
     if (ref?.botMessageId) {
-      await this.tg.editMessageText(ref.chatId, ref.botMessageId, `🗑 ${id} gelöscht (liegt im Obsidian-Papierkorb).`).catch(() => {});
+      await this.tg.editMessageText(ref.chatId, ref.botMessageId, `🗑 ${id} deleted (in Obsidian's trash).`).catch(() => {});
     }
-    await this.tg.sendMessage(this.chatId, `🗑 ${id} gelöscht.`, { replyTo: msg.message_id });
-    this.svc.log.info("Upload gelöscht", { id, verschoben: moved.length });
+    await this.tg.sendMessage(this.chatId, `🗑 ${id} deleted.`, { replyTo: msg.message_id });
+    this.svc.log.info("Upload deleted", { id, moved: moved.length });
   }
 
   async onCallback(q: TgCallbackQuery) {
-    const m = /^lvl:([\w-]+):(brand|kampagne|merken)$/.exec(q.data ?? "");
+    const m = /^lvl:([\w-]+):(brand|campaign|keep|kampagne|merken)$/.exec(q.data ?? "");
     if (!m || q.message?.chat.id !== this.chatId) {
       await this.tg.answerCallbackQuery(q.id);
       return;
     }
     if (!this.senderName(q.from)) {
-      await this.tg.answerCallbackQuery(q.id, "Nicht freigeschaltet.");
+      await this.tg.answerCallbackQuery(q.id, "Not allowed.");
       return;
     }
-    const [, id, ebene] = m;
+    const id = m[1];
+    const level: Level = LEGACY_LEVEL[m[2]] ?? (m[2] as Level);
     const u = readUpload(this.svc.vault, id);
     if (!u) {
-      await this.tg.answerCallbackQuery(q.id, "Upload nicht mehr vorhanden.");
+      await this.tg.answerCallbackQuery(q.id, "This upload no longer exists.");
       return;
     }
-    const wasBriefing = u.briefing;
-    u.ebene = ebene as Ebene;
-    if (u.ebene !== "kampagne" && wasBriefing) {
-      // Briefing gehört nicht mehr zur Ebene: in den Papierkorb
-      this.svc.vault.trash(wasBriefing);
-      u.briefing = undefined;
+    const oldBrief = u.brief;
+    u.level = level;
+    if (u.level !== "campaign" && oldBrief) {
+      // the brief no longer belongs to the level: move it to the trash
+      this.svc.vault.trash(oldBrief);
+      u.brief = undefined;
     }
     writeUpload(this.svc.vault, u);
-    await this.tg.answerCallbackQuery(q.id, `Ebene: ${EBENEN_LABEL[u.ebene]}`);
-    // Bot-Nachricht kennen, auch wenn der State verloren ging
+    await this.tg.answerCallbackQuery(q.id, `Level: ${LEVEL_LABEL[u.level]}`);
+    // know the bot message even if the state was lost
     if (q.message && !this.state.data.uploads[id]) {
       this.state.data.uploads[id] = { chatId: q.message.chat.id, photoMessageId: q.message.reply_to_message?.message_id ?? 0, botMessageId: q.message.message_id, senderId: q.from.id, createdAt: Date.now() };
     }
-    await this.refreshBotMessage(u, u.ebene === "merken" && !this.svc.cfg.analyse_bei_merken ? undefined : "⏳ Analyse läuft …");
+    await this.refreshBotMessage(u, u.level === "keep" && !this.svc.cfg.analyze_keep ? undefined : "⏳ Analysing …");
     await this.reanalyse(id);
   }
 
@@ -309,7 +309,7 @@ export class TelegramHandler {
   }
 }
 
-/** Long-Polling-Schleife. Endet, wenn signal abgebrochen wird. */
+/** Long-polling loop. Ends when the signal is aborted. */
 export async function runPolling(handler: TelegramHandler, tg: TelegramApi, state: BotState, svc: Services, signal: AbortSignal) {
   let backoff = 1000;
   while (!signal.aborted) {
@@ -321,7 +321,7 @@ export async function runPolling(handler: TelegramHandler, tg: TelegramApi, stat
         await handler.handleUpdate(u);
       }
     } catch (err) {
-      svc.log.warn("getUpdates fehlgeschlagen, neuer Versuch", { fehler: err instanceof Error ? err.message : String(err), warteMs: backoff });
+      svc.log.warn("getUpdates failed, retrying", { error: err instanceof Error ? err.message : String(err), waitMs: backoff });
       await new Promise((r) => setTimeout(r, backoff));
       backoff = Math.min(backoff * 2, 60_000);
     }

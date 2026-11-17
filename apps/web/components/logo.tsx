@@ -1,7 +1,7 @@
 import { PencilCircle } from "./pencil-circle";
 import { cn } from "@/lib/utils";
 
-/** Wortmarke „tasteloop“ mit handgezogenem Rotstift-Kreis um „loop“. */
+/** Wordmark "tasteloop" with a hand-drawn red pencil circle around "loop". */
 export function Logo({ className, draw = false }: { className?: string; draw?: boolean }) {
   return (
     <span className={cn("inline-flex items-baseline font-bold tracking-[-0.045em] text-[var(--ink)]", className)}>

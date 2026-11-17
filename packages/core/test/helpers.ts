@@ -22,53 +22,53 @@ export const TINY_JPEG = Buffer.from(
 );
 
 export function makeVault(overrides: (cfg: BrandConfig) => void = () => {}): { cfg: BrandConfig; vault: Vault; root: string } {
-  const root = mkdtempSync(join(tmpdir(), "ab-vault-"));
+  const root = mkdtempSync(join(tmpdir(), "tl-vault-"));
   mkdirSync(join(root, ".obsidian"));
-  mkdirSync(join(root, "Marke"), { recursive: true });
-  writeFileSync(join(root, "Marke", "Brand Guide.md"), fixture("guide.md"));
-  writeFileSync(join(root, "Fremd.md"), "Diese Datei gehört nicht zum Brand-System.\n");
-  const cfg = parseBrandConfig(fixture("brand.yaml").replace("/wird/im/test/ersetzt", root));
+  mkdirSync(join(root, "Brand"), { recursive: true });
+  writeFileSync(join(root, "Brand", "Brand Guide.md"), fixture("guide.md"));
+  writeFileSync(join(root, "Private.md"), "This file is not part of Tasteloop.\n");
+  const cfg = parseBrandConfig(fixture("brand.yaml").replace("/replaced/in/test", root));
   overrides(cfg);
   const vault = new Vault(cfg);
   ensureVaultStructure(vault);
   return { cfg, vault, root };
 }
 
-export const ANALYSE_FIXTURE = {
-  kurzbeschreibung: "Paar am Küchentisch im warmen Abendlicht, analoge Körnung.",
-  gefaellt: ["Warmes Seitenlicht", "Echte Haut, keine Retusche"],
-  gefaellt_nicht: ["Logo eines Fremdanbieters im Bild"],
-  stilmerkmale: {
-    farbe: ["Off-White", "Terrakotta #C8643B"],
-    licht: ["Seitenlicht, golden hour"],
-    komposition: ["Halbtotale, Augenhöhe"],
-    typografie: [],
-    material_textur: ["Filmkorn"],
-    stimmung: ["vertraut", "verspielt"],
+export const ANALYSIS_FIXTURE = {
+  summary: "A couple at the kitchen table in warm evening light, analogue grain.",
+  likes: ["Warm side light", "Real skin, no retouching"],
+  dislikes: ["Another company's logo in the image"],
+  style: {
+    color: ["Off-white", "Terracotta #C8643B"],
+    light: ["Side light, golden hour"],
+    composition: ["Medium shot, eye level"],
+    typography: [],
+    material: ["Film grain"],
+    mood: ["familiar", "playful"],
   },
-  bezug_zur_marke: "Stützt „Bildwelt“ und „Farbe“.",
-  ebene_empfehlung: "brand" as const,
-  schlagworte: ["warm", "analog", "filmkorn"],
+  brand_fit: "Supports \"Imagery\" and \"Colour\".",
+  level_suggestion: "brand" as const,
+  keywords: ["warm", "analogue", "grain"],
 };
 
-export const BRIEFING_FIXTURE = {
-  titel: "Wintergefühl zu zweit",
-  ziel: "Neugier auf das Produkt im Dezember wecken.",
-  stil_der_referenz: ["Warme, gedeckte Farben", "Viel Weißraum"],
-  nicht_uebernehmen: ["Das Paar-Motiv der Referenz", "Den Claim der Referenz", "Das Layout mit Logo unten rechts"],
-  grenzen_aus_brand_guide: [{ abschnitt: "3. Look and Feel > Bildwelt", regel: "Echte Menschen, kein Stock." }],
-  motiv_ideen: ["Zwei Tassen auf der Fensterbank", "Hände unter einer Decke"],
-  prompt_bausteine: [] as string[],
-  text_ideen: ["Mehr als Netflix."],
-  offene_fragen: ["Budget?"],
+export const BRIEF_FIXTURE = {
+  title: "Winter for two",
+  goal: "Make people curious about the product in December.",
+  style_to_take: ["Warm, muted colours", "Lots of white space"],
+  do_not_take: ["The couple motif of the reference", "The reference's claim", "The layout with the logo bottom right"],
+  guide_limits: [{ section: "3. Look and Feel > Imagery", rule: "Real people, no stock." }],
+  motif_ideas: ["Two cups on the windowsill", "Hands under a blanket"],
+  prompt_blocks: [] as string[],
+  copy_ideas: ["More than Netflix."],
+  open_questions: ["Budget?"],
 };
 
 export class FakeLlm implements LlmClient {
   calls: StructuredRequest<unknown>[] = [];
-  responses: Record<string, unknown[]> = { analyse: [], digest: [], briefing: [] };
+  responses: Record<string, unknown[]> = { analysis: [], digest: [], brief: [] };
   failNext: Record<string, Error | undefined> = {};
 
-  queue(purpose: "analyse" | "digest" | "briefing", data: unknown) {
+  queue(purpose: "analysis" | "digest" | "brief", data: unknown) {
     this.responses[purpose].push(data);
     return this;
   }
@@ -81,10 +81,10 @@ export class FakeLlm implements LlmClient {
       throw err;
     }
     const q = this.responses[req.purpose];
-    const fallback = req.purpose === "analyse" ? ANALYSE_FIXTURE : req.purpose === "briefing" ? BRIEFING_FIXTURE : undefined;
+    const fallback = req.purpose === "analysis" ? ANALYSIS_FIXTURE : req.purpose === "brief" ? BRIEF_FIXTURE : undefined;
     const data = (q.length ? q.shift() : fallback) as T;
-    if (data === undefined) throw new Error(`FakeLlm: keine Antwort für ${req.purpose} hinterlegt`);
-    // Schema muss die Antwort akzeptieren (prüft, dass Fixtures zum echten Schema passen)
+    if (data === undefined) throw new Error(`FakeLlm: no response queued for ${req.purpose}`);
+    // the schema must accept the response (checks that fixtures match the real schema)
     const parsed = req.schema.parse(data);
     return { data: parsed, usage: { inputTokens: 5000, outputTokens: 800, cacheReadTokens: 0, cacheWriteTokens: 0, model: req.model } };
   }
@@ -92,10 +92,10 @@ export class FakeLlm implements LlmClient {
 
 export class FakeTranscriber implements Transcriber {
   calls = 0;
-  constructor(public text = "Das Licht ist super, das ist was für die Marke", public fail = false) {}
+  constructor(public text = "The light is great, this is one for the brand", public fail = false) {}
   async transcribe() {
     this.calls++;
-    if (this.fail) throw new Error("kaputt");
+    if (this.fail) throw new Error("broken");
     return { text: this.text, engine: "fake" };
   }
 }

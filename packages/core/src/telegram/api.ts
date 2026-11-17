@@ -1,7 +1,6 @@
 /**
- * Minimaler Telegram-Bot-API-Client (Long Polling). Keine Abhängigkeit,
- * fetch ist injizierbar, damit Tests ohne Netz laufen.
- * Der Token taucht nie in Logs oder Fehlermeldungen auf.
+ * Minimal Telegram Bot API client (long polling). No dependencies; fetch is injectable,
+ * so tests run without network access. The token never appears in logs or error messages.
  */
 export interface TgUser {
   id: number;
@@ -84,7 +83,7 @@ export class HttpTelegramApi implements TelegramApi {
       signal: AbortSignal.timeout(timeoutMs),
     });
     const json = (await res.json().catch(() => ({}))) as { ok?: boolean; result?: T; description?: string };
-    if (!json.ok) throw new TelegramError(method, res.status, json.description ?? "unbekannter Fehler");
+    if (!json.ok) throw new TelegramError(method, res.status, json.description ?? "unknown error");
     return json.result as T;
   }
 
@@ -116,7 +115,7 @@ export class HttpTelegramApi implements TelegramApi {
         reply_markup: { inline_keyboard: keyboard ?? [] },
       });
     } catch (err) {
-      // "message is not modified" ist kein Fehler
+      // "message is not modified" is not an error
       if (err instanceof TelegramError && /not modified/i.test(err.message)) return;
       throw err;
     }
@@ -128,9 +127,9 @@ export class HttpTelegramApi implements TelegramApi {
 
   async downloadFile(fileId: string) {
     const file = await this.call<{ file_path?: string }>("getFile", { file_id: fileId });
-    if (!file.file_path) throw new TelegramError("getFile", 0, "kein file_path (Datei > 20 MB?)");
+    if (!file.file_path) throw new TelegramError("getFile", 0, "no file_path (file larger than 20 MB?)");
     const res = await this.fetchFn(`${this.fileBase}/${file.file_path}`, { signal: AbortSignal.timeout(60_000) });
-    if (!res.ok) throw new TelegramError("download", res.status, "Download fehlgeschlagen");
+    if (!res.ok) throw new TelegramError("download", res.status, "download failed");
     return { data: Buffer.from(await res.arrayBuffer()), path: file.file_path };
   }
 }

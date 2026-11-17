@@ -1,11 +1,10 @@
 "use client";
 
 /**
- * Aceternity UI „Focus Cards“ (ui.aceternity.com, freie Komponente), als Grundgerüst übernommen
- * und auf Stil D „Markup“ umgebaut: kein Blur, kein Verlauf, kein dunkles Overlay.
- * Fokus heißt hier nur: die anderen Karten treten leise zurück.
- * Karten wie Fotos auf Papier, Bildunterschrift darunter, Begründung als Randnotiz.
- * Markierte Karten (z. B. in den Guide übernommen) bekommen einen Rotstift-Kreis.
+ * Aceternity UI "Focus Cards" (ui.aceternity.com, free component), used as the base and rebuilt
+ * in the "Markup" style: no blur, no gradient, no dark overlay. Focus only means the other cards
+ * step back quietly. Cards look like photos on paper, caption below, the reason as a margin note.
+ * Marked cards (e.g. applied to the guide) get a red pencil circle.
  */
 import React, { useState } from "react";
 import Link from "next/link";

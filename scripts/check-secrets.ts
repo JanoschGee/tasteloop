@@ -20,7 +20,7 @@ export function checkRepo(root: string): string[] {
   const problems: string[] = [];
   for (const f of files) {
     if (isForbiddenFile(f)) {
-      problems.push(`${f}: Dateityp darf nie eingecheckt werden`);
+      problems.push(`${f}: this file type must never be committed`);
       continue;
     }
     if (BINARY.test(f)) continue;
@@ -44,8 +44,8 @@ if (isMain) {
   const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
   const problems = checkRepo(root);
   if (problems.length) {
-    console.error("Secret-Check fehlgeschlagen:\n  " + problems.join("\n  "));
+    console.error("Secret check failed:\n  " + problems.join("\n  "));
     process.exit(1);
   }
-  console.log("Secret-Check: keine Secrets gefunden.");
+  console.log("Secret check: no secrets found.");
 }

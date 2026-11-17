@@ -26,7 +26,7 @@ function walk(dir: string, acc: string[] = []): string[] {
   return acc;
 }
 
-/** Markennamen aus allen echten Marken-Configs (brands/*.yaml ohne Beispiel, plus docs/internal/brands). */
+/** Brand names from all real brand configs (brands/*.yaml except the example, plus docs/internal/brands). */
 export function brandTerms(root: string): string[] {
   const terms = new Set<string>();
   for (const dir of ["brands", "docs/internal/brands"]) {
@@ -39,22 +39,24 @@ export function brandTerms(root: string): string[] {
     for (const f of files) {
       if (!/\.ya?ml$/.test(f) || f === "example.yaml") continue;
       const cfg = parse(readFileSync(join(root, dir, f), "utf8"));
-      if (cfg?.marke?.id) terms.add(String(cfg.marke.id).toLowerCase());
-      if (cfg?.marke?.name) terms.add(String(cfg.marke.name).toLowerCase());
+      const b = cfg?.brand ?? cfg?.marke; // "marke" = old German format
+      if (b?.id) terms.add(String(b.id).toLowerCase());
+      if (b?.name) terms.add(String(b.name).toLowerCase());
     }
   }
   return [...terms].filter((t) => t.length >= 3);
 }
 
-export function checkNeutral(root: string): string[] {
-  const terms = brandTerms(root);
+/** termsRoot: where the real brand configs live (for scanning an export without them) */
+export function checkNeutral(root: string, termsRoot = root): string[] {
+  const terms = brandTerms(termsRoot);
   const problems: string[] = [];
   for (const d of CODE_DIRS) {
     for (const f of walk(join(root, d))) {
       if (f.endsWith("check-neutral.ts")) continue;
       const text = readFileSync(f, "utf8").toLowerCase();
       for (const t of terms) {
-        if (text.includes(t)) problems.push(`${relative(root, f)}: enthält Markenname „${t}“`);
+        if (text.includes(t)) problems.push(`${relative(root, f)}: contains brand name "${t}"`);
       }
     }
   }
@@ -66,8 +68,8 @@ if (isMain) {
   const root = process.cwd();
   const problems = checkNeutral(root);
   if (problems.length) {
-    console.error("Neutralitäts-Check fehlgeschlagen:\n  " + problems.join("\n  "));
+    console.error("Brand-neutrality check failed:\n  " + problems.join("\n  "));
     process.exit(1);
   }
-  console.log("Neutralitäts-Check: Code und UI sind markenneutral.");
+  console.log("Brand-neutrality check: code and UI contain no brand names.");
 }

@@ -1,7 +1,7 @@
 /**
- * Öffentliche Vorlage (templates/brand-guide.md) mit der Beispiel-Config (brands/example.yaml):
- * Sperre per Frontmatter, Lernbereich, gesperrte Tokens, Protokollzeile, Version, Briefing-Bausteine.
- * Damit ist garantiert: Wer mit Vorlage und Beispiel startet, bekommt ein funktionierendes System.
+ * Public template (templates/brand-guide.md) with the example config (brands/example.yaml):
+ * lock via frontmatter, learning area, locked tokens, changelog row, version, brief blocks.
+ * Guarantees: whoever starts from template and example gets a working system.
  */
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -14,14 +14,14 @@ import { lockRules, sectionIndex } from "../src/guide/context";
 import { applyChange, assertGuideIntegrity, findSection, isEditable, isLocked, LockedSectionError, missingLocks, parseGuide } from "../src/guide/sections";
 import { analyseUpload } from "../src/jobs/analyse";
 import { runApply } from "../src/jobs/apply";
-import { readBausteine } from "../src/jobs/briefing";
+import { readPromptBlocks } from "../src/jobs/briefing";
 import { runDigest } from "../src/jobs/digest";
 import { silentLogger } from "../src/log";
 import type { Services } from "../src/services";
 import { ensureVaultStructure } from "../src/vault/bases";
 import { listUploads, writeUpload } from "../src/vault/uploads";
 import { Vault } from "../src/vault/vault";
-import { ANALYSE_FIXTURE, BRIEFING_FIXTURE, FakeLlm, FakeTranscriber, TINY_JPEG } from "./helpers";
+import { ANALYSIS_FIXTURE, BRIEF_FIXTURE, FakeLlm, FakeTranscriber, TINY_JPEG } from "./helpers";
 
 const REPO = resolve(__dirname, "../../..");
 const GUIDE = readFileSync(join(REPO, "templates/brand-guide.md"), "utf8");
@@ -29,9 +29,9 @@ const GUIDE = readFileSync(join(REPO, "templates/brand-guide.md"), "utf8");
 function setup() {
   const root = mkdtempSync(join(tmpdir(), "tl-template-"));
   const cfg: BrandConfig = parseBrandConfig(readFileSync(join(REPO, "brands/example.yaml"), "utf8"));
-  cfg.vault.wurzel = root;
+  cfg.vault.root = root;
   mkdirSync(join(root, ".obsidian"));
-  const guidePath = join(root, cfg.brand_guide.datei);
+  const guidePath = join(root, cfg.guide.file);
   mkdirSync(dirname(guidePath), { recursive: true });
   writeFileSync(guidePath, GUIDE);
   writeFileSync(join(root, "Private.md"), "do not touch\n");
@@ -48,12 +48,12 @@ const body = (ref: string) => {
   return g.lines.slice(s.bodyStart, s.bodyEnd).join("\n");
 };
 
-describe("Vorlage und Beispiel-Config passen zusammen", () => {
-  it("alle Sperren und Lernbereiche existieren in der Vorlage", () => {
+describe("template and example config fit together", () => {
+  it("all locks and learning sections exist in the template", () => {
     expect(missingLocks(GUIDE, lockRules(setup().vault))).toEqual([]);
   });
 
-  it("Kern gesperrt, nur Teil 2 lernt", () => {
+  it("the core is locked, only Part 2 learns", () => {
     const h = setup();
     const g = parseGuide(GUIDE);
     const r = lockRules(h.vault);
@@ -64,78 +64,78 @@ describe("Vorlage und Beispiel-Config passen zusammen", () => {
     expect(isEditable(sec("2.5 Prompt building blocks"), r, g)).toBe(true);
     expect(isEditable(sec("How to use this guide"), r, g)).toBe(false);
     expect(isEditable(sec("3. References"), r, g)).toBe(false);
-    expect(isEditable(sec("4. Change log"), r, g)).toBe(false);
-    expect(sectionIndex(h.vault, GUIDE)).toContain("2. Expression (learns) > 2.3 Imagery [bearbeitbar]");
+    expect(isEditable(sec("4. Changelog"), r, g)).toBe(false);
+    expect(sectionIndex(h.vault, GUIDE)).toContain("2. Expression (learns) > 2.3 Imagery [editable]");
   });
 
-  it("verweigert Kern, Bereiche außerhalb und gesperrte Farb-Tokens; Frontmatter-Sperre lässt sich nicht entfernen", () => {
+  it("refuses the core, sections outside the learning area and locked colour tokens; the frontmatter lock can't be removed", () => {
     const r = lockRules(setup().vault);
-    expect(() => applyChange(GUIDE, { abschnitt: "1.3 Never", art: "ergaenzen", text: "- anything" }, r)).toThrow(LockedSectionError);
-    expect(() => applyChange(GUIDE, { abschnitt: "3. References", art: "ersetzen", text: "x" }, r)).toThrow(LockedSectionError);
-    expect(() => applyChange(GUIDE, { abschnitt: "2.1 Colour", art: "ersetzen", text: body("2.1 Colour").replace("#111111", "#000000") }, r)).toThrow(/color\.ink/);
-    expect(applyChange(GUIDE, { abschnitt: "2.1 Colour", art: "ersetzen", text: body("2.1 Colour").replace("#E2231A", "#D91F16") }, r)).toContain("#D91F16");
+    expect(() => applyChange(GUIDE, { section: "1.3 Never", change: "extend", text: "- anything" }, r)).toThrow(LockedSectionError);
+    expect(() => applyChange(GUIDE, { section: "3. References", change: "replace", text: "x" }, r)).toThrow(LockedSectionError);
+    expect(() => applyChange(GUIDE, { section: "2.1 Colour", change: "replace", text: body("2.1 Colour").replace("#111111", "#000000") }, r)).toThrow(/color\.ink/);
+    expect(applyChange(GUIDE, { section: "2.1 Colour", change: "replace", text: body("2.1 Colour").replace("#E2231A", "#D91F16") }, r)).toContain("#D91F16");
     const unlocked = GUIDE.replace('locked: ["1. Core (locked)"]', "locked: []");
-    expect(() => assertGuideIntegrity(GUIDE, unlocked, r, [])).toThrow(/Frontmatter/);
+    expect(() => assertGuideIntegrity(GUIDE, unlocked, r, [])).toThrow(/frontmatter/i);
   });
 
-  it("die Einbettung der Galerie zeigt auf die Datei und View, die das System anlegt", () => {
+  it("the gallery embed points to the file and view the system creates", () => {
     const h = setup();
     const m = /!\[\[([^\]#|]+\.base)#([^\]|]+)\]\]/.exec(GUIDE)!;
-    expect(join(dirname(h.cfg.brand_guide.datei), m[1])).toBe(h.vault.dirs.galerie);
-    const base = parse(h.vault.readText(h.vault.dirs.galerie));
+    expect(join(dirname(h.cfg.guide.file), m[1])).toBe(h.vault.dirs.gallery);
+    const base = parse(h.vault.readText(h.vault.dirs.gallery));
     expect(base.views.map((v: { name: string }) => v.name)).toContain(m[2]);
     expect(GUIDE).toContain("`Tasteloop/Moodboard.canvas`");
   });
 
-  it("liest die Prompt-Bausteine aus 2.5", () => {
-    const { bausteine, hinweise } = readBausteine(GUIDE, "2.5 Prompt building blocks");
-    expect(bausteine.map((b) => b.name)).toEqual(["Film", "Light", "Colour", "Closing"]);
-    expect(bausteine[3].prompt).toBe("No text, no logos, no brand marks, no watermark.");
-    expect(hinweise).toContain("Never in a prompt");
+  it("reads the prompt building blocks from 2.5", () => {
+    const { blocks, notes } = readPromptBlocks(GUIDE, "2.5 Prompt building blocks");
+    expect(blocks.map((b) => b.name)).toEqual(["Film", "Light", "Colour", "Closing"]);
+    expect(blocks[3].prompt).toBe("No text, no logos, no brand marks, no watermark.");
+    expect(notes).toContain("Never in a prompt");
   });
 });
 
-describe("Lernschleife mit der Vorlage", () => {
-  it("übernimmt eine Freigabe in Teil 2: englische Protokollzeile, version +1, updated = heute", async () => {
+describe("learning loop with the template", () => {
+  it("applies an approval to Part 2: changelog row, version +1, updated = today", async () => {
     const h = setup();
-    const bild = `${h.vault.dirs.bilder}/u1.jpg`;
-    h.vault.writeBytes(bild, TINY_JPEG);
-    writeUpload(h.vault, { id: "20261113-1000-aaaa", marke: "x", ebene: "brand", absender: "Sam", datum: "2026-11-13T10:00:00", status: "analysiert", bild, begruendung: "Side light", transkript: [], korrekturen: [], analyse: ANALYSE_FIXTURE, extraSections: [] });
+    const image = `${h.vault.dirs.images}/u1.jpg`;
+    h.vault.writeBytes(image, TINY_JPEG);
+    writeUpload(h.vault, { id: "20261113-1000-aaaa", brand: "x", level: "brand", sender: "Sam", date: "2026-11-13T10:00:00", status: "analyzed", image, why: "Side light", transcript: [], corrections: [], analysis: ANALYSIS_FIXTURE, extraSections: [] });
     h.llm.queue("digest", {
-      zusammenfassung: "Side light.",
-      vorschlaege: [
-        { titel: "Side light", abschnitt: "2. Expression (learns) > 2.3 Imagery", art: "ergaenzen", neuer_text: "- **Direction:** light comes from the side.", begruendung: "b", belege: ["20261113-1000-aaaa"], uneinig: [] },
-        { titel: "Change purpose", abschnitt: "1.1 Purpose", art: "ersetzen", neuer_text: "x", begruendung: "b", belege: ["20261113-1000-aaaa"], uneinig: [] },
+      summary: "Side light.",
+      proposals: [
+        { title: "Side light", section: "2. Expression (learns) > 2.3 Imagery", change: "extend", new_text: "- **Direction:** light comes from the side.", reasoning: "b", evidence: ["20261113-1000-aaaa"], disputes: [] },
+        { title: "Change purpose", section: "1.1 Purpose", change: "replace", new_text: "x", reasoning: "b", evidence: ["20261113-1000-aaaa"], disputes: [] },
       ],
-      kern_hinweise: [],
-      uneinig_ohne_vorschlag: [],
+      core_notes: [],
+      disputes_without_proposal: [],
     });
     const r = await runDigest(h.svc);
-    expect(r.vorschlaege).toHaveLength(1);
-    expect(r.kernHinweise).toBe(1);
-    const doc = parseMd(h.vault.readText(r.vorschlaege[0]));
-    Object.assign(doc.props, { status: "freigegeben", freigegeben_von: "Sam" });
-    writeFileSync(join(h.root, r.vorschlaege[0]), stringifyMd(doc));
-    expect(runApply(h.svc)[0].status).toBe("übernommen");
+    expect(r.proposals).toHaveLength(1);
+    expect(r.coreNotes).toBe(1);
+    const doc = parseMd(h.vault.readText(r.proposals[0]));
+    Object.assign(doc.props, { status: "approved", approved_by: "Sam" });
+    writeFileSync(join(h.root, r.proposals[0]), stringifyMd(doc));
+    expect(runApply(h.svc)[0].status).toBe("applied");
     const after = readFileSync(h.guidePath, "utf8");
     const fm = parseMd(after).props;
     expect(fm.version).toBe(2);
     expect(fm.updated).toBe("2026-11-16");
     expect(fm.locked).toEqual(["1. Core (locked)"]);
     expect(after).toContain("- **Direction:** light comes from the side.");
-    expect(after).toMatch(/\| 2026-11-16 \| 2\.3 Imagery \| Side light \(ergänzt\) \| \[\[.*\\\|Vorschlag\]\] \| Sam \|/);
+    expect(after).toMatch(/\| 2026-11-16 \| 2\.3 Imagery \| Side light \(extended\) \| \[\[.*\\\|Proposal\]\] \| Sam \|/);
     expect(readFileSync(join(h.root, "Private.md"), "utf8")).toBe("do not touch\n");
   });
 
-  it("Briefing nimmt passende Bausteine wörtlich und die Prüfliste aus 2.6", async () => {
+  it("the brief copies matching blocks word for word and appends the checklist from 2.6", async () => {
     const h = setup();
     const id = "20261113-1100-bbbb";
-    const bild = `${h.vault.dirs.bilder}/${id}.jpg`;
-    h.vault.writeBytes(bild, TINY_JPEG);
-    writeUpload(h.vault, { id, marke: "x", ebene: "kampagne", absender: "Alex", datum: "2026-11-13T11:00:00", status: "neu", bild, begruendung: "We want an ad like this", transkript: [], korrekturen: [], extraSections: [] });
-    h.llm.queue("briefing", { ...BRIEFING_FIXTURE, prompt_bausteine: ["Light", "Closing"] });
+    const image = `${h.vault.dirs.images}/${id}.jpg`;
+    h.vault.writeBytes(image, TINY_JPEG);
+    writeUpload(h.vault, { id, brand: "x", level: "campaign", sender: "Alex", date: "2026-11-13T11:00:00", status: "new", image, why: "We want an ad like this", transcript: [], corrections: [], extraSections: [] });
+    h.llm.queue("brief", { ...BRIEF_FIXTURE, prompt_blocks: ["Light", "Closing"] });
     await analyseUpload(h.svc, id);
-    const text = h.vault.readText(listUploads(h.vault)[0].briefing!);
+    const text = h.vault.readText(listUploads(h.vault)[0].brief!);
     expect(text).toContain("| Closing | no text, no logos | `No text, no logos, no brand marks, no watermark.` |");
     expect(text).not.toContain("| Film |");
     expect(text).toContain("#### 2.6 Review checklist");

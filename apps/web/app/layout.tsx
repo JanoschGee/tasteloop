@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-// Handschrift für Randnotizen: Caveat (SIL Open Font License), selbst gehostet über den Build, kein Google-CDN
+// Handwriting for margin notes: Caveat (SIL Open Font License), self-hosted through the build, no Google CDN
 import "@fontsource/caveat/latin-400.css";
 import "@fontsource/caveat/latin-600.css";
 import "./globals.css";
@@ -14,9 +14,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-function markenName(): string {
+function brandName(): string {
   try {
-    return reader().cfg.marke.name;
+    return reader().cfg.brand.name;
   } catch {
     return "Brand";
   }
@@ -24,9 +24,9 @@ function markenName(): string {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de">
+    <html lang="en">
       <body className="min-h-screen bg-[var(--paper)]">
-        <Nav marke={markenName()} />
+        <Nav brand={brandName()} />
         <main className="mx-auto max-w-6xl px-6 py-12">{children}</main>
         <footer className="mx-auto max-w-6xl px-6 pb-10 pt-6 text-xs text-[var(--muted)]">
           <span className="font-hand text-[1.2rem] text-[var(--pencil)]">circle it. say why.</span>

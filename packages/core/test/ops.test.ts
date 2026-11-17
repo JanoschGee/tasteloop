@@ -51,11 +51,11 @@ describe("Installationsskript", () => {
 
   it("macht im Trockenlauf nichts und erklärt jeden Schritt", () => {
     const out = execFileSync("bash", [SCRIPT, "--brand", "testmarke"], { encoding: "utf8", env: { ...process.env, PATH: "/usr/bin:/bin:/usr/sbin:/opt/homebrew/bin" } });
-    expect(out).toContain("Trockenlauf");
-    expect(out).toMatch(/würde ausführen: \S*brew install node@22 whisper-cpp ffmpeg cloudflared/);
-    expect(out).toContain("wird nicht verändert");
+    expect(out).toContain("Dry run");
+    expect(out).toMatch(/would run: \S*brew install node@22 whisper-cpp ffmpeg cloudflared/);
+    expect(out).toContain("(not changed)");
     expect(out).not.toMatch(/fdesetup (enable|disable)|autoLoginUser -|pmset|networksetup/);
-    expect(out).toContain("würde ausführen: sudo launchctl bootstrap system /Library/LaunchDaemons/eu.tasteloop.testmarke.bot.plist");
+    expect(out).toContain("would run: sudo launchctl bootstrap system /Library/LaunchDaemons/eu.tasteloop.testmarke.bot.plist");
     expect(out).not.toContain("+ sudo");
   });
 
@@ -65,9 +65,9 @@ describe("Installationsskript", () => {
     expect(() => execFileSync("bash", [SCRIPT, "--brand", "t"], { stdio: "pipe", env: { ...process.env, WEB_PORT: "8123" } })).toThrow();
   });
 
-  it("startet mit --ohne-dienste keine Dienste", () => {
-    const out = execFileSync("bash", [SCRIPT, "--brand", "testmarke", "--ohne-dienste"], { encoding: "utf8" });
-    expect(out).toContain("Übersprungen (--ohne-dienste)");
+  it("starts no services with --no-services", () => {
+    const out = execFileSync("bash", [SCRIPT, "--brand", "testmarke", "--no-services"], { encoding: "utf8" });
+    expect(out).toContain("Skipped (--no-services)");
     expect(out).not.toContain("launchctl bootstrap");
   });
 

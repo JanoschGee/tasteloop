@@ -1,0 +1,47 @@
+marke:
+  id: altmarke
+  name: Altmarke
+sprache: de
+telegram:
+  chat_id: -1001234567890
+  absender:
+    "111": Anna
+    "222": Ben
+  nur_bekannte_absender: true
+  zuordnung_minuten: 15
+vault:
+  wurzel: /replaced/in/test
+  ordner: "Marke/Brand-Inbox"
+brand_guide:
+  datei: "Marke/Guide.md"
+  gesperrte_abschnitte: []
+  frontmatter_sperre: gesperrt
+  praeambel_gesperrt: true
+  lernbereich:
+    - "2. Ausdruck (lernt)"
+  gesperrte_tokens:
+    - "`color.base`"
+  protokoll_abschnitt: "4. Änderungsprotokoll"
+  version_feld: version
+  datum_feld: stand
+  analyse_kontext: []
+  briefing_bausteine: "2.2 Prompt-Bausteine"
+  briefing_anhaenge:
+    - "2.3 Prüfliste"
+freigebende:
+  - Anna
+modelle:
+  analyse: claude-sonnet-5-5
+  digest: claude-sonnet-5-5
+  briefing: claude-sonnet-5-5
+transkription:
+  lokal:
+    aktiv: false
+  api:
+    aktiv: false
+    anbieter: elevenlabs
+analyse_bei_merken: false
+ebenen_stichworte:
+  brand: [marke]
+  kampagne: [anzeige]
+  merken: [archiv]

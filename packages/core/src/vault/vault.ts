@@ -1,8 +1,8 @@
 /**
- * Zugriff auf den Vault. Alle Schreibzugriffe laufen hier durch:
- * - nur innerhalb des Brand-Ordners (plus die Brand-Guide-Datei, siehe guide/apply.ts)
- * - atomar (temp-Datei + rename), damit Obsidian Sync nie halbe Dateien sieht
- * - mit Secret-Prüfung: Text mit Secret-Muster wird nicht geschrieben
+ * Vault access. Every write goes through here:
+ * - only inside Tasteloop's folder (plus the guide file, see jobs/apply.ts) and Obsidian's .trash
+ * - atomic (temp file + rename), so Obsidian Sync never sees half-written files
+ * - with a secret check: text containing a secret pattern is never written
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
@@ -19,42 +19,42 @@ export class VaultPathError extends Error {
 
 export class Vault {
   readonly root: string;
-  /** Brand-Ordner, vault-relativ (mit "/") */
+  /** Tasteloop's folder, vault-relative (with "/") */
   readonly brandDir: string;
 
   constructor(readonly cfg: BrandConfig) {
-    this.root = resolve(cfg.vault.wurzel);
-    this.brandDir = cfg.vault.ordner.replace(/\\/g, "/").replace(/\/+$/, "");
+    this.root = resolve(cfg.vault.root);
+    this.brandDir = cfg.vault.folder.replace(/\\/g, "/").replace(/\/+$/, "");
   }
 
-  /** Vault-relativer Pfad im Brand-Ordner */
+  /** vault-relative path inside Tasteloop's folder */
   rel(...parts: string[]): string {
     return [this.brandDir, ...parts].filter(Boolean).join("/");
   }
 
   get dirs() {
-    const u = this.cfg.vault.unterordner;
+    const u = this.cfg.vault.subfolders;
     return {
       uploads: this.rel(u.uploads),
-      bilder: this.rel(u.bilder),
-      vorschlaege: this.rel(u.vorschlaege),
-      briefings: this.rel(u.briefings),
-      galerie: this.rel(u.galerie),
-      vorschlaegeAnsicht: this.rel(u.vorschlaege_ansicht),
+      images: this.rel(u.images),
+      proposals: this.rel(u.proposals),
+      briefs: this.rel(u.briefs),
+      gallery: this.rel(u.gallery),
+      proposalsView: this.rel(u.proposals_view),
       moodboard: this.rel(u.moodboard),
-      aenderungslog: this.rel(u.aenderungslog),
+      changelog: this.rel(u.changelog),
     };
   }
 
   get guidePath(): string {
-    return this.cfg.brand_guide.datei.replace(/\\/g, "/");
+    return this.cfg.guide.file.replace(/\\/g, "/");
   }
 
-  /** Absoluter Pfad, mit Schutz gegen Ausbruch aus dem Vault */
+  /** absolute path, guarded against escaping the vault */
   abs(relPath: string): string {
     const p = resolve(this.root, relPath);
     if (p !== this.root && !p.startsWith(this.root + sep)) {
-      throw new VaultPathError(`Pfad außerhalb des Vaults: ${relPath}`);
+      throw new VaultPathError(`Path outside the vault: ${relPath}`);
     }
     return p;
   }
@@ -65,7 +65,7 @@ export class Vault {
     const guide = this.abs(this.guidePath);
     const trash = this.abs(".trash");
     const ok = p === guide || p.startsWith(brand + sep) || p.startsWith(trash + sep);
-    if (!ok) throw new VaultPathError(`Schreiben außerhalb des Brand-Ordners verweigert: ${relPath}`);
+    if (!ok) throw new VaultPathError(`Refusing to write outside Tasteloop's folder: ${relPath}`);
     return p;
   }
 
@@ -97,7 +97,7 @@ export class Vault {
     renameSync(tmp, abs);
   }
 
-  /** Markdown-Dateien eines Ordners (nicht rekursiv), vault-relativ */
+  /** Markdown files of a folder (not recursive), vault-relative */
   listMd(relDir: string): string[] {
     const abs = this.abs(relDir);
     if (!existsSync(abs)) return [];
@@ -107,10 +107,7 @@ export class Vault {
       .sort();
   }
 
-  /**
-   * Verschiebt eine Datei in den Obsidian-Papierkorb (.trash im Vault).
-   * Rückholbar, solange der Papierkorb nicht geleert wird.
-   */
+  /** Moves a file into Obsidian's trash (.trash in the vault). Recoverable until the trash is emptied. */
   trash(relPath: string): string | undefined {
     const src = this.assertWritable(relPath);
     if (!existsSync(src)) return undefined;

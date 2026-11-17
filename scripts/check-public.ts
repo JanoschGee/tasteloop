@@ -41,8 +41,9 @@ export function publicFiles(root: string): string[] {
     .filter((f) => !f.startsWith("docs/internal/") && !BINARY.test(f) && existsSync(join(root, f)));
 }
 
-export function checkPublic(root: string): string[] | undefined {
-  const bl = blocklist(root);
+/** blocklistRoot: where docs/internal lives (for scanning an export that has no docs/internal) */
+export function checkPublic(root: string, blocklistRoot = root): string[] | undefined {
+  const bl = blocklist(blocklistRoot);
   if (!bl) return undefined;
   const problems: string[] = [];
   for (const f of publicFiles(root)) {
@@ -52,7 +53,7 @@ export function checkPublic(root: string): string[] | undefined {
     lines.forEach((line, i) => {
       let l = line.toLowerCase();
       for (const a of bl.allow) l = l.split(a).join("");
-      for (const t of bl.terms) if (l.includes(t.toLowerCase())) problems.push(`${f}:${i + 1}: enthält „${t}“`);
+      for (const t of bl.terms) if (l.includes(t.toLowerCase())) problems.push(`${f}:${i + 1}: contains "${t}"`);
     });
   }
   return problems;
@@ -63,11 +64,11 @@ if (isMain) {
   const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
   const problems = checkPublic(root);
   if (!problems) {
-    console.log("Öffentlich-Check: übersprungen (keine Sperrliste in docs/internal).");
+    console.log("Public check: skipped (no blocklist in docs/internal).");
   } else if (problems.length) {
-    console.error("Öffentlich-Check fehlgeschlagen:\n  " + problems.join("\n  "));
+    console.error("Public check failed:\n  " + problems.join("\n  "));
     process.exit(1);
   } else {
-    console.log("Öffentlich-Check: nichts Internes im öffentlichen Teil.");
+    console.log("Public check: nothing internal in the public part.");
   }
 }

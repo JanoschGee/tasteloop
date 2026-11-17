@@ -1,22 +1,22 @@
 /**
- * Obsidian-Markdown -> normales Markdown für react-markdown:
- * Einbettungen ![[bild.jpg|240]] werden zu Bildern über /api/bild,
- * Wikilinks [[pfad|text]] zu Links auf bekannte Seiten oder zu Text.
+ * Obsidian Markdown -> plain Markdown for react-markdown:
+ * embeds ![[image.jpg|240]] become images via /api/image,
+ * wikilinks [[path|text]] become links to known pages or plain text.
  */
 import { imageUrl } from "./vault";
 
 export interface LinkTargets {
   uploadsDir: string;
-  vorschlaegeDir: string;
-  briefingsDir: string;
+  proposalsDir: string;
+  briefsDir: string;
 }
 
 function linkFor(target: string, t: LinkTargets): string | undefined {
   const clean = target.replace(/\.md$/, "");
   const name = clean.split("/").pop()!;
   if (clean.startsWith(t.uploadsDir + "/")) return `/upload/${encodeURIComponent(name)}`;
-  if (clean.startsWith(t.vorschlaegeDir + "/")) return `/vorschlaege/${encodeURIComponent(name)}`;
-  if (clean.startsWith(t.briefingsDir + "/")) return `/briefings/${encodeURIComponent(name)}`;
+  if (clean.startsWith(t.proposalsDir + "/")) return `/proposals/${encodeURIComponent(name)}`;
+  if (clean.startsWith(t.briefsDir + "/")) return `/briefs/${encodeURIComponent(name)}`;
   return undefined;
 }
 

@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Randnotiz in Handschrift: die Begründung („why: …“). Jede Person hat ihre eigene Stiftfarbe,
- * so werden mehrere Beitragende sichtbar. Rot bleibt dem Kreis vorbehalten.
+ * Margin note in handwriting: the reason ("why: …"). Every person has their own pen colour,
+ * so several contributors become visible. Red is reserved for the circle.
  */
 const PENS = ["#23408E", "#1F6F3B", "#3A3A3A", "#5A2D82", "#7A4A12"];
 

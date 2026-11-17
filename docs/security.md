@@ -54,4 +54,4 @@ Afterwards, check the guide's change log and the proposals for unexpected approv
 
 ## Approval is trust-based
 
-Obsidian cannot prove who set `freigegeben_von`. Everyone who can write to the vault can approve. Keep the vault shared with the people you'd also trust with the brand guide.
+Obsidian cannot prove who set `approved_by`. Everyone who can write to the vault can approve. Keep the vault shared with the people you'd also trust with the brand guide.

@@ -1,7 +1,7 @@
 /**
- * Transkription von Sprachnachrichten.
- * 1. lokal: whisper.cpp (whisper-cli), Audio vorher per ffmpeg nach 16 kHz WAV (0 € pro Upload)
- * 2. Fallback: API (ElevenLabs Scribe oder OpenAI), nur wenn lokal fehlschlägt und ein Key da ist
+ * Voice note transcription.
+ * 1. local: whisper.cpp (whisper-cli), audio converted to 16 kHz WAV with ffmpeg first (free)
+ * 2. fallback: API (ElevenLabs Scribe or OpenAI), only if local fails and a key is set
  */
 import { execFile } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -36,7 +36,7 @@ export class WhisperCppTranscriber implements Transcriber {
   ) {}
 
   async transcribe(audio: Buffer, filename: string): Promise<TranscriptResult> {
-    if (!existsSync(this.opts.model)) throw new Error(`Whisper-Modell fehlt: ${this.opts.model}`);
+    if (!existsSync(this.opts.model)) throw new Error(`Whisper model missing: ${this.opts.model}`);
     const dir = mkdtempSync(join(tmpdir(), "ab-whisper-"));
     try {
       const input = join(dir, filename.replace(/[^\w.-]/g, "_") || "audio.oga");
@@ -51,7 +51,7 @@ export class WhisperCppTranscriber implements Transcriber {
         { timeoutMs },
       );
       const text = readFileSync(`${outBase}.txt`, "utf8").replace(/\s+/g, " ").trim();
-      if (!text) throw new Error("Whisper lieferte keinen Text");
+      if (!text) throw new Error("Whisper returned no text");
       return { text, engine: "whisper.cpp" };
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -76,7 +76,7 @@ export class ElevenLabsTranscriber implements Transcriber {
     });
     if (!res.ok) throw new Error(`ElevenLabs STT: HTTP ${res.status}`);
     const json = (await res.json()) as { text?: string };
-    if (!json.text) throw new Error("ElevenLabs STT: kein Text");
+    if (!json.text) throw new Error("ElevenLabs STT: no text");
     return { text: json.text.trim(), engine: `elevenlabs/${this.model}` };
   }
 }
@@ -86,7 +86,7 @@ export class OpenAiTranscriber implements Transcriber {
 
   async transcribe(audio: Buffer, filename: string): Promise<TranscriptResult> {
     const form = new FormData();
-    // Telegram-Sprachnachrichten sind OGG/Opus; .ogg wird akzeptiert
+    // Telegram voice notes are OGG/Opus; .ogg is accepted
     form.append("file", new Blob([new Uint8Array(audio)]), filename.replace(/\.oga$/, ".ogg"));
     form.append("model", this.model);
     form.append("language", this.language);
@@ -97,12 +97,12 @@ export class OpenAiTranscriber implements Transcriber {
     });
     if (!res.ok) throw new Error(`OpenAI STT: HTTP ${res.status}`);
     const json = (await res.json()) as { text?: string };
-    if (!json.text) throw new Error("OpenAI STT: kein Text");
+    if (!json.text) throw new Error("OpenAI STT: no text");
     return { text: json.text.trim(), engine: `openai/${this.model}` };
   }
 }
 
-/** Probiert die Transkriber der Reihe nach. */
+/** Tries the transcribers in order. */
 export class ChainTranscriber implements Transcriber {
   constructor(private chain: Transcriber[], private log: Logger) {}
 
@@ -114,29 +114,29 @@ export class ChainTranscriber implements Transcriber {
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         errors.push(msg);
-        this.log.warn(`Transkription fehlgeschlagen (${t.constructor.name}), nächster Versuch`, { fehler: msg });
+        this.log.warn(`Transcription failed (${t.constructor.name}), trying the next one`, { error: msg });
       }
     }
-    throw new Error(`Keine Transkription möglich: ${errors.join(" | ") || "kein Transkriber konfiguriert"}`);
+    throw new Error(`Transcription not possible: ${errors.join(" | ") || "no transcriber configured"}`);
   }
 }
 
 export function buildTranscriber(cfg: BrandConfig, secrets: Secrets, log: Logger, exec: Exec = nodeExec, fetchFn: FetchFn = fetch): Transcriber {
   const chain: Transcriber[] = [];
-  const t = cfg.transkription;
-  if (t.lokal.aktiv) {
+  const t = cfg.transcription;
+  if (t.local.enabled) {
     chain.push(
       new WhisperCppTranscriber(
-        { binary: t.lokal.binary, model: t.lokal.modell, ffmpeg: t.lokal.ffmpeg, language: t.lokal.sprache, timeoutSec: t.lokal.timeout_sekunden },
+        { binary: t.local.binary, model: t.local.model, ffmpeg: t.local.ffmpeg, language: t.local.language, timeoutSec: t.local.timeout_seconds },
         exec,
       ),
     );
   }
-  if (t.api.aktiv) {
-    if (t.api.anbieter === "elevenlabs" && secrets.elevenlabsApiKey) {
-      chain.push(new ElevenLabsTranscriber(secrets.elevenlabsApiKey, t.api.modell ?? "scribe_v1", t.lokal.sprache, fetchFn));
-    } else if (t.api.anbieter === "openai" && secrets.openaiApiKey) {
-      chain.push(new OpenAiTranscriber(secrets.openaiApiKey, t.api.modell ?? "gpt-4o-mini-transcribe", t.lokal.sprache, fetchFn));
+  if (t.api.enabled) {
+    if (t.api.provider === "elevenlabs" && secrets.elevenlabsApiKey) {
+      chain.push(new ElevenLabsTranscriber(secrets.elevenlabsApiKey, t.api.model ?? "scribe_v1", t.local.language, fetchFn));
+    } else if (t.api.provider === "openai" && secrets.openaiApiKey) {
+      chain.push(new OpenAiTranscriber(secrets.openaiApiKey, t.api.model ?? "gpt-4o-mini-transcribe", t.local.language, fetchFn));
     }
   }
   return new ChainTranscriber(chain, log);

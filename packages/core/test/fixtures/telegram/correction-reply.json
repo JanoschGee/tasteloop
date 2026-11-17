@@ -5,7 +5,7 @@
     "date": 1762950090,
     "chat": { "id": -1001234567890, "type": "supergroup" },
     "from": { "id": 222, "first_name": "Ben" },
-    "text": "Mir gefällt eher das Licht als die Farbe",
+    "text": "I like the light more than the colour",
     "reply_to_message": { "message_id": 500, "date": 1762950001, "chat": { "id": -1001234567890, "type": "supergroup" } }
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Nur-Lese-Zugriff für die Web-Galerie. Kein LLM, kein Telegram, keine Schreibzugriffe.
+ * Read-only access for the web gallery. No LLM, no Telegram, no writes.
  */
 import { extname } from "node:path";
 import { loadBrandConfig, type BrandConfig } from "./config";
@@ -10,8 +10,8 @@ import { asArray, unwikilink } from "./util";
 import { listUploads, readUpload, type Upload } from "./vault/uploads";
 import { Vault } from "./vault/vault";
 
-export type { Upload, Ebene, EbeneOderOffen, Analyse } from "./vault/uploads";
-export { EBENEN, EBENEN_LABEL } from "./vault/uploads";
+export type { Upload, Level, LevelOrOpen, Analysis } from "./vault/uploads";
+export { LEVELS, LEVEL_LABEL, STYLE_LABEL } from "./vault/uploads";
 
 export interface Reader {
   cfg: BrandConfig;
@@ -36,7 +36,7 @@ export interface GuideBlock {
   ref: string;
   level: number;
   locked: boolean;
-  /** Markdown inkl. Überschrift, nur eigener Text */
+  /** Markdown including the heading, own text only */
   markdown: string;
 }
 
@@ -65,7 +65,7 @@ export interface NoteSummary {
   name: string;
   props: Record<string, unknown>;
   body: string;
-  bild?: string;
+  image?: string;
 }
 
 function notes(r: Reader, dir: string, typ?: string): NoteSummary[] {
@@ -73,22 +73,22 @@ function notes(r: Reader, dir: string, typ?: string): NoteSummary[] {
     .listMd(dir)
     .map((path) => {
       const { props, body } = parseMd(r.vault.readText(path));
-      return { path, name: path.split("/").pop()!.replace(/\.md$/, ""), props, body, bild: unwikilink(props.bild ?? props.referenzbild) };
+      return { path, name: path.split("/").pop()!.replace(/\.md$/, ""), props, body, image: unwikilink(props.image ?? props.reference) };
     })
-    .filter((n) => !typ || n.props.typ === typ)
+    .filter((n) => !typ || n.props.type === typ)
     .sort((a, b) => b.name.localeCompare(a.name));
 }
 
 export function proposals(r: Reader): NoteSummary[] {
-  return notes(r, r.vault.dirs.vorschlaege, "vorschlag");
+  return notes(r, r.vault.dirs.proposals, "proposal");
 }
 
 export function digests(r: Reader): NoteSummary[] {
-  return notes(r, r.vault.dirs.vorschlaege, "digest");
+  return notes(r, r.vault.dirs.proposals, "digest");
 }
 
-export function briefings(r: Reader): NoteSummary[] {
-  return notes(r, r.vault.dirs.briefings, "briefing");
+export function briefs(r: Reader): NoteSummary[] {
+  return notes(r, r.vault.dirs.briefs, "brief");
 }
 
 export function noteByName(list: NoteSummary[], name: string): NoteSummary | undefined {
@@ -104,7 +104,7 @@ export const IMAGE_TYPES: Record<string, string> = {
 };
 
 /**
- * Liefert ein Bild aus dem Brand-Ordner. Alles außerhalb (auch per ../) wird abgelehnt.
+ * Returns an image from Tasteloop's folder. Anything outside (including via ../) is refused.
  */
 export function readImage(r: Reader, relPath: string): { data: Buffer; type: string } | undefined {
   const clean = relPath.replace(/\\/g, "/");
@@ -123,14 +123,14 @@ export function readImage(r: Reader, relPath: string): { data: Buffer; type: str
 export { asArray, unwikilink };
 
 /**
- * Uploads, die als Beleg in einem übernommenen oder freigegebenen Vorschlag stehen.
- * Die Galerie umkreist sie mit Rotstift („hat es in den Guide geschafft“).
+ * Uploads cited as evidence in an applied or approved proposal.
+ * The gallery circles them in red pencil ("made it into the guide").
  */
 export function acceptedUploadIds(r: Reader): Set<string> {
   const ids = new Set<string>();
   for (const p of proposals(r)) {
-    if (p.props.status !== "übernommen" && p.props.status !== "freigegeben") continue;
-    for (const b of asArray(p.props.belege as string[] | string | undefined)) {
+    if (p.props.status !== "applied" && p.props.status !== "approved") continue;
+    for (const b of asArray(p.props.evidence as string[] | string | undefined)) {
       const path = unwikilink(b);
       const id = path?.split("/").pop()?.replace(/\.md$/, "");
       if (id) ids.add(id);

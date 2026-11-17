@@ -1,68 +1,68 @@
 # Weekly digest and approval
 
-Once a week (Monday 8:00 in the provided schedules), the digest reads all new, analysed **Brand** uploads and asks Claude for at most five changes to Part 2 of your guide. Each proposal becomes its own note in `<ordner>/Vorschläge/` (proposals). The group gets a short message with the titles and their support.
+Once a week (Monday 8:00 in the provided schedules), the digest reads all new, analysed **Brand** uploads and asks Claude for at most five changes to Part 2 of your guide. Each proposal becomes its own note in `<folder>/Proposals/`. The group gets a short message with the titles and their support.
 
 ## What a proposal contains
 
-- Title, target section, and whether it **replaces** or **extends** the section (`art: ersetzen` / `ergaenzen`).
-- The reasoning.
-- A **diff** against the current guide.
-- The new text between two markers. You may edit it before approving.
-- The **evidence**: links to the uploads, with their images.
-- The **support** (see below).
+- Title, target section, and whether it **replaces** or **extends** the section (`change: replace` / `extend`)
+- the reasoning
+- a **diff** against the current guide
+- the new text between two markers, which you may edit before approving
+- the **evidence**: links to the uploads, with their images
+- the **support** (see below)
 
-Proposals that would touch a locked section are never created as proposals. They appear as notes for humans under "Kern-Hinweise" (core notes) in the digest note.
+Proposals that would touch a locked section are never created as proposals. They appear as "core notes" in the digest note, for people to decide.
 
 ## Support: who backs it
 
-Tasteloop counts the support itself from the evidence, not from what the model says:
+Tasteloop counts the support itself, from the evidence, not from what the model says:
 
 | Property | Meaning |
 |---|---|
-| `stuetze_personen` | number of **different** people |
-| `stuetze_belege` | number of references |
-| `stuetze_namen` | their names |
+| `support_people` | number of **different** people |
+| `support_refs` | number of references |
+| `supporters` | their names |
 
-The note shows "**Stütze:** 3 Personen, 5 Belege (Alex, Kim, Sam)" (support: 3 people, 5 references). `Vorschläge.base` sorts by people, then by references, so broadly backed proposals come first. Ten images from one person count as one person.
+The note shows "**Support:** 3 people, 5 references (Alex, Kim, Sam)". `Proposals.base` sorts by people, then by references, so broadly backed proposals come first. Ten images from one person count as one person.
 
 ## Single voice
 
-If only one person backs a proposal, it is marked `einzelstimme: true` and shows a note "Einzelstimme" (single voice). It is **not** hidden and can be approved normally. It just deserves a conscious decision.
+If only one person backs a proposal, it is marked `single_voice: true` and gets a "Single voice" note. It is **not** hidden and can be approved normally. It just deserves a conscious decision.
 
-## Disagreement
+## Disputes
 
-If one person praises something another criticises, the proposal gets a section "**Uneinig**" (disagreement):
+If one person praises something another criticises, the proposal gets a **Disputed** section. For each point it shows:
 - what the point is
 - the references **for** it, with names
 - the references **against** it, with names
 
-`uneinig` counts the points. Tasteloop checks every reported disagreement: both sides need evidence, and from different people. Otherwise it is dropped and listed under "dropped" in the digest note.
+`disputed` counts the points. Tasteloop checks every reported dispute: both sides need evidence, from different people. Otherwise the dispute is dropped and listed in the digest note.
 
-**A disagreeing proposal is never applied quietly.** Even after approval it waits until someone sets `uneinig_geklaert: true` (resolved), ideally after adjusting the text. Disagreements without a proposal are listed in the digest note.
+**A disputed proposal is never applied quietly.** Even after approval it waits until someone sets `dispute_resolved: true`, ideally after adjusting the text. Disputes without a proposal are listed in the digest note.
 
 ## Approve or reject
 
-In Obsidian, open the proposal and set the properties:
+In Obsidian, open the proposal and set its properties:
 
 | To | Set |
 |---|---|
-| approve | `status: freigegeben` and `freigegeben_von: <your name>` |
-| reject | `status: abgelehnt` |
-| approve a disagreement | additionally `uneinig_geklaert: true` |
+| approve | `status: approved` and `approved_by: <your name>` |
+| reject | `status: rejected` |
+| approve a disputed proposal | additionally `dispute_resolved: true` |
 
-Every 10 minutes the approval job applies approved proposals: it writes the guide, adds a change-log row, raises `version`, and sets the proposal to `übernommen` (applied) with a log at the end of the note. The group gets a message.
+Every 10 minutes the approval job applies approved proposals. It writes the guide, adds a changelog row, raises `version` and sets the proposal to `applied`, with a log at the end of the note. The group gets a message.
 
 Other outcomes:
 
-| Status / message | Meaning | What to do |
+| Status or message | Meaning | What to do |
 |---|---|---|
-| stays `freigegeben`, message "not allowed" | `freigegeben_von` is not in `freigebende` | enter a listed name |
-| stays `freigegeben`, message "uneinig" | disagreement not resolved | resolve, then `uneinig_geklaert: true` |
-| `gesperrt` (locked) | target is locked or outside the learning area | change it by hand if you really want to |
-| `konflikt` (conflict) | the section changed since the proposal (replace only) | check, then approve again, or delete `alt_hash` to force |
-| `fehler` (error) | e.g. section not found | see the log at the end of the note |
+| stays `approved`, "not in the approvers list" | `approved_by` missing or not in `approvers` | enter a listed name |
+| stays `approved`, "People disagree here" | dispute not resolved | resolve it, then set `dispute_resolved: true` |
+| `locked` | the target is locked or outside the learning area | change it by hand if you really want to |
+| `conflict` | the section changed since the proposal was written (replace only) | check it, then approve again, or delete `base_hash` to force it |
+| `error` | for example the section wasn't found | see the log at the end of the note |
 
-**Approval is trust-based.** Obsidian cannot prove who set a property. Anyone with write access to the vault can approve. For a small team that is usually fine; the change log, the proposal note and Obsidian's file history show what happened.
+**Approval is trust-based.** Obsidian can't prove who set a property. Anyone with write access to the vault can approve. For a small team that's usually fine; the changelog, the proposal note and Obsidian's file history show what happened.
 
 ## Run it now
 
@@ -74,4 +74,4 @@ npm run digest -- --brand <config>
 npm run apply -- --brand <config>
 ```
 
-Add `--still` to either command to skip the chat message.
+Add `--quiet` to either command to skip the chat message.

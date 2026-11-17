@@ -1,89 +1,88 @@
 /**
- * Obsidian-Bases-Dateien (.base, YAML): Galerie der Uploads als Karten,
- * Tabelle der offenen Vorschläge. Werden nur angelegt, wenn sie fehlen,
- * damit Anpassungen in Obsidian erhalten bleiben.
+ * Obsidian Bases files (.base, YAML): gallery of uploads as cards, table of proposals.
+ * Created only when missing, so changes made in Obsidian are kept.
  */
 import { stringify } from "yaml";
 import type { Vault } from "./vault";
 import { emptyCanvas } from "./canvas";
 
-export function galerieBase(v: Vault): string {
+export function galleryBase(v: Vault): string {
   const doc = {
-    filters: { and: [`file.inFolder("${v.dirs.uploads}")`, 'typ == "upload"'] },
+    filters: { and: [`file.inFolder("${v.dirs.uploads}")`, 'type == "upload"'] },
     properties: {
-      "note.ebene": { displayName: "Ebene" },
-      "note.absender": { displayName: "Von" },
-      "note.datum": { displayName: "Datum" },
+      "note.level": { displayName: "Level" },
+      "note.sender": { displayName: "From" },
+      "note.date": { displayName: "Date" },
       "note.status": { displayName: "Status" },
     },
     views: [
       {
         type: "cards",
-        name: "Galerie",
-        image: "note.bild",
+        name: "Gallery",
+        image: "note.image",
         imageFit: "cover",
-        order: ["file.name", "ebene", "absender", "datum", "status"],
-        sort: [{ property: "note.datum", direction: "DESC" }],
+        order: ["file.name", "level", "sender", "date", "status"],
+        sort: [{ property: "note.date", direction: "DESC" }],
       },
       {
         type: "cards",
         name: "Brand",
-        image: "note.bild",
-        filters: { and: ['ebene == "brand"'] },
-        order: ["file.name", "absender", "datum", "status"],
-        sort: [{ property: "note.datum", direction: "DESC" }],
+        image: "note.image",
+        filters: { and: ['level == "brand"'] },
+        order: ["file.name", "sender", "date", "status"],
+        sort: [{ property: "note.date", direction: "DESC" }],
       },
       {
         type: "cards",
-        name: "Kampagne",
-        image: "note.bild",
-        filters: { and: ['ebene == "kampagne"'] },
-        order: ["file.name", "absender", "datum", "briefing"],
-        sort: [{ property: "note.datum", direction: "DESC" }],
+        name: "Campaign",
+        image: "note.image",
+        filters: { and: ['level == "campaign"'] },
+        order: ["file.name", "sender", "date", "brief"],
+        sort: [{ property: "note.date", direction: "DESC" }],
       },
       {
         type: "table",
-        name: "Liste",
-        order: ["file.name", "ebene", "absender", "datum", "status", "stil"],
-        sort: [{ property: "note.datum", direction: "DESC" }],
+        name: "List",
+        order: ["file.name", "level", "sender", "date", "status", "style"],
+        sort: [{ property: "note.date", direction: "DESC" }],
       },
     ],
   };
   return stringify(doc, { lineWidth: 0 });
 }
 
-export function vorschlaegeBase(v: Vault): string {
+export function proposalsBase(v: Vault): string {
   const doc = {
-    filters: { and: [`file.inFolder("${v.dirs.vorschlaege}")`] },
+    filters: { and: [`file.inFolder("${v.dirs.proposals}")`, 'type == "proposal"'] },
     views: [
       {
         type: "table",
-        name: "Offen",
-        filters: { and: ['status == "offen"'] },
-        order: ["file.name", "stuetze_personen", "stuetze_belege", "einzelstimme", "uneinig", "abschnitt", "art", "erstellt", "freigegeben_von"],
+        name: "Open",
+        filters: { and: ['status == "open"'] },
+        order: ["file.name", "support_people", "support_refs", "single_voice", "disputed", "section", "change", "created", "approved_by"],
         sort: [
-          { property: "note.stuetze_personen", direction: "DESC" },
-          { property: "note.stuetze_belege", direction: "DESC" },
+          { property: "note.support_people", direction: "DESC" },
+          { property: "note.support_refs", direction: "DESC" },
         ],
       },
       {
         type: "table",
-        name: "Uneinig",
-        filters: { and: ["uneinig > 0", 'status != "übernommen"'] },
-        order: ["file.name", "uneinig", "uneinig_geklaert", "stuetze_namen", "abschnitt", "status"],
+        name: "Disputed",
+        filters: { and: ["disputed > 0", 'status != "applied"'] },
+        order: ["file.name", "disputed", "dispute_resolved", "supporters", "section", "status"],
       },
       {
         type: "table",
-        name: "Alle",
-        order: ["file.name", "abschnitt", "status", "erstellt", "uebernommen_am"],
-        sort: [{ property: "note.erstellt", direction: "DESC" }],
+        name: "All",
+        order: ["file.name", "section", "status", "created", "applied_at"],
+        sort: [{ property: "note.created", direction: "DESC" }],
       },
     ],
   };
   return stringify(doc, { lineWidth: 0 });
 }
 
-/** Legt fehlende Strukturdateien an. Bestehende werden nicht verändert. */
+/** Creates missing structure files. Existing ones are left alone. */
 export function ensureVaultStructure(v: Vault): string[] {
   const created: string[] = [];
   const put = (p: string, text: string) => {
@@ -92,12 +91,12 @@ export function ensureVaultStructure(v: Vault): string[] {
       created.push(p);
     }
   };
-  put(v.dirs.galerie, galerieBase(v));
-  put(v.dirs.vorschlaegeAnsicht, vorschlaegeBase(v));
+  put(v.dirs.gallery, galleryBase(v));
+  put(v.dirs.proposalsView, proposalsBase(v));
   put(v.dirs.moodboard, JSON.stringify(emptyCanvas(), null, "\t") + "\n");
   put(
-    v.dirs.aenderungslog,
-    `---\ntyp: aenderungslog\n---\n\n# Änderungslog Brand Guide\n\nHier trägt das System jede übernommene Änderung ein (neueste oben).\n\n<!-- einträge -->\n`,
+    v.dirs.changelog,
+    `---\ntype: changelog\n---\n\n# Brand guide changelog\n\nTasteloop adds every applied change here (newest first).\n\n<!-- entries -->\n`,
   );
   return created;
 }

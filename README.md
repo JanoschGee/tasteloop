@@ -58,7 +58,7 @@ A team with 30 uploads a month pays roughly **$1–2 a month** in API costs. Det
 
 - **Self-hosted only.** The bot has to run somewhere: a laptop while it's open, a Mac mini or a small Linux server. See [docs/always-on.md](docs/always-on.md).
 - **Telegram only** for capturing, for now.
-- **The interface is German for now.** Bot messages, note headings, properties (`ebene`, `status: freigegeben`, …) and config keys are German. Every term is explained in English in the docs. An English interface is planned.
+- **English interface, your language for content.** Bot, notes and gallery are English. Analyses, digests and briefs come in English or German (`language: en|de`); your brand guide can be in any language.
 - **Obsidian** is the memory. The optional web gallery reads the same files.
 - **No support.** Docs, the setup skill and the [FAQ](docs/faq.md) are all there is. Please don't expect help by email.
 

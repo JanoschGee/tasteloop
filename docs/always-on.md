@@ -36,14 +36,14 @@ Obsidian Sync or iCloud distributes the notes to your team as usual.
 - all jobs as LaunchDaemons that start at boot without a login: bot, approval, digest, gallery, Cloudflare tunnel and Obsidian Headless Sync
 - Homebrew, Node 22, whisper.cpp, ffmpeg and cloudflared, if missing
 
-It is a dry run by default and changes nothing until you add `--apply`. It never touches FileVault, auto-login, energy or network settings. Comments and messages in the script are German.
+It is a dry run by default and changes nothing until you add `--apply`. It never touches FileVault, auto-login, energy or network settings.
 
 ```bash
 ops/install-macmini.sh --brand your-brand --vault /Users/branding/Vaults/YourVault --config ~/.config/tasteloop/brands/your-brand.yaml
 ```
 
 Recommended order:
-1. Run it with `--apply --ohne-dienste` (without starting services).
+1. Run it with `--apply --no-services`.
 2. Fill in the secrets, log in to Obsidian and set up the tunnel, as the script prints.
 3. Run it again with `--apply` to start the services.
 
@@ -73,7 +73,7 @@ Headless syncs the whole vault. It can only exclude **folders**, not single file
 npm run sync-plan -- --vault /path/to/full/vault --keep "Brand" --out ~/sync-excludes.txt
 ```
 
-It lists files that would still sync because they sit in parent folders. Move them into subfolders, or accept them via `vault.sync_erlaubt`. Set the exclusions **before** the first sync. `npm run doctor` on the host reports anything outside `vault.sync_nur`.
+It lists files that would still sync because they sit in parent folders. Move them into subfolders, or accept them via `vault.sync_allowed`. Set the exclusions **before** the first sync. `npm run doctor` on the host reports anything outside `vault.sync_only`.
 
 ### FileVault and power cuts
 

@@ -2,7 +2,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { obsidianToMarkdown, type LinkTargets } from "@/lib/markdown";
 
-/** Rendert Vault-Markdown. Rohes HTML wird nicht ausgeführt (react-markdown ohne rehype-raw). */
+/** Renders vault Markdown. Raw HTML is not executed (react-markdown without rehype-raw). */
 export function Markdown({ text, targets }: { text: string; targets: LinkTargets }) {
   return (
     <div className="prose-ab">

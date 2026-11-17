@@ -9,8 +9,8 @@ The memory is a folder of Markdown files with Obsidian features: properties, a B
 **Can we use Slack, Teams or WhatsApp instead of Telegram?**
 Not yet. Telegram works without a public server address, which keeps self-hosting simple.
 
-**Is the interface available in English?**
-Not yet. Bot messages, note headings and property names are German. The docs explain every term.
+**Which languages does it speak?**
+The interface (bot, notes, gallery, commands) is English. Analyses, digests and briefs come in English or German (`language: en` or `de`). Your brand guide can be in any language; see [brand-guide.md](brand-guide.md#a-guide-in-another-language).
 
 **Which AI models does it use?**
 Claude for image analysis, digests and briefs (`claude-sonnet-5-5` by default, configurable). Transcription runs locally with whisper.cpp, with an optional ElevenLabs or OpenAI fallback.

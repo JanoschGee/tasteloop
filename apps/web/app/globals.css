@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 /*
- * Tasteloop, Stil D „Markup“: Papier, Tinte, Rotstift. Ruhig und menschlich.
- * Nie: Verläufe, 3D, Glanz, Schatten-Effekte. Farbe bringen die Bilder,
- * der Rotstift ist der einzige Akzent.
+ * Tasteloop, "Markup" style: paper, ink, red pencil. Calm and human.
+ * Never: gradients, 3D, gloss, shadow effects. The images bring the colour,
+ * the red pencil is the only accent.
  */
 :root {
   --paper: #faf8f3;
@@ -16,7 +16,7 @@
 
 @theme inline {
   --font-sans: "Helvetica Neue", Helvetica, "Inter", Arial, sans-serif;
-  /* Caveat wird mit dem Build ausgeliefert (siehe layout.tsx); Systemschriften nur als Notnagel */
+  /* Caveat ships with the build (see layout.tsx); system fonts only as a last resort */
   --font-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
   --color-paper: var(--paper);
   --color-ink: var(--ink);

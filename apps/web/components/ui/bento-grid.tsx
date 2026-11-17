@@ -1,6 +1,6 @@
 /**
- * Aceternity UI „Bento Grid“ (ui.aceternity.com, freie Komponente), als Grundgerüst übernommen.
- * Stil D „Markup“: flache Karten auf Papier, Haarlinie statt Schatten, keine Hover-Effekte außer Unterstreichung.
+ * Aceternity UI "Bento Grid" (ui.aceternity.com, free component), used as the base.
+ * "Markup" style: flat cards on paper, hairlines instead of shadows, no hover effects except an underline.
  */
 import { cn } from "@/lib/utils";
 

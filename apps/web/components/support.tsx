@@ -4,20 +4,20 @@ import { PencilCircle } from "./pencil-circle";
 import { Pill } from "./pill";
 
 /**
- * Stütze eines Vorschlags: je Person ein Kreis in ihrer Stiftfarbe um ihr Initial,
- * dazu „3 Personen, 5 Belege“. Einzelstimme und Uneinigkeit als Etikett.
+ * Support of a proposal: one circle per person in their pen colour around their initial,
+ * plus "3 people, 5 references". Single voice and disputes as labels.
  */
 export function SupportMarks({ props, size = "sm" }: { props: Record<string, unknown>; size?: "sm" | "lg" }) {
-  const namen = asArray(props.stuetze_namen as string[] | string | undefined).map(String);
-  const personen = Number(props.stuetze_personen ?? namen.length);
-  const belege = Number(props.stuetze_belege ?? 0);
-  const uneinig = Number(props.uneinig ?? 0);
-  if (!namen.length && !belege) return null;
+  const names = asArray(props.supporters as string[] | string | undefined).map(String);
+  const people = Number(props.support_people ?? names.length);
+  const refs = Number(props.support_refs ?? 0);
+  const disputed = Number(props.disputed ?? 0);
+  if (!names.length && !refs) return null;
   const dim = size === "lg" ? "h-9 w-9 text-[1.35rem]" : "h-7 w-7 text-[1.05rem]";
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <div className="flex items-center gap-1.5" aria-label={`Gestützt von ${namen.join(", ")}`}>
-        {namen.map((n) => (
+      <div className="flex items-center gap-1.5" aria-label={`Supported by ${names.join(", ")}`}>
+        {names.map((n) => (
           <span key={n} title={n} className={`font-hand relative inline-flex items-center justify-center ${dim}`} style={{ color: penFor(n) }}>
             {n.slice(0, 1).toUpperCase()}
             <PencilCircle seed={`person-${n}`} color={penFor(n)} width={1.4} draw={false} style={{ inset: 0, width: "100%", height: "100%" }} />
@@ -25,10 +25,10 @@ export function SupportMarks({ props, size = "sm" }: { props: Record<string, unk
         ))}
       </div>
       <span className="text-xs text-[var(--muted)]">
-        {personen} {personen === 1 ? "Person" : "Personen"}, {belege} {belege === 1 ? "Beleg" : "Belege"}
+        {people} {people === 1 ? "person" : "people"}, {refs} {refs === 1 ? "reference" : "references"}
       </span>
-      {props.einzelstimme === true && <Pill tone="outline">Einzelstimme</Pill>}
-      {uneinig > 0 && <Pill tone={props.uneinig_geklaert === true ? "neutral" : "pencil"}>{props.uneinig_geklaert === true ? "Uneinig, geklärt" : `Uneinig (${uneinig})`}</Pill>}
+      {props.single_voice === true && <Pill tone="outline">Single voice</Pill>}
+      {disputed > 0 && <Pill tone={props.dispute_resolved === true ? "neutral" : "pencil"}>{props.dispute_resolved === true ? "Disputed, resolved" : `Disputed (${disputed})`}</Pill>}
     </div>
   );
 }

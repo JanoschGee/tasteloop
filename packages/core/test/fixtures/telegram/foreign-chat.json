@@ -5,7 +5,7 @@
     "date": 1762950000,
     "chat": { "id": -1009999999999, "type": "supergroup" },
     "from": { "id": 111, "first_name": "Anna" },
-    "caption": "fremde Gruppe",
+    "caption": "another group",
     "photo": [{ "file_id": "photo-x", "file_unique_id": "x", "width": 800, "height": 600 }]
   }
 }
