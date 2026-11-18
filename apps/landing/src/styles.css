@@ -117,7 +117,10 @@ main > section { padding-top: clamp(3.5rem, 9vw, 7rem); padding-bottom: 1rem; }
 .hero { display: grid; gap: 2.5rem; align-items: center; padding-top: clamp(2.5rem, 7vw, 5rem) !important; }
 .lede { font-size: clamp(1.3rem, 2.6vw, 1.7rem); line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 1rem; max-width: 26ch; }
 .what { max-width: 46ch; color: #262626; }
-.hero h1 .circle { left: -7%; top: -10%; width: 114%; height: 124%; }
+.for-line { font-size: clamp(1.1rem, 2.2vw, 1.35rem); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 1.1rem; }
+.hero .for-line .circle { left: -9%; top: -26%; width: 118%; height: 152%; }
+.for-line .circled { margin: 0 0.35em; }
+.hero h1 { font-size: clamp(2.5rem, 5.2vw, 4.1rem); }
 .what-loop { margin-top: -0.3em; }
 .hero-note { color: var(--pencil); font-size: 1.75rem; }
 .hero-meta { font-size: 0.85rem; color: var(--muted); margin: 0; }
@@ -338,6 +341,20 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
 .plain li::before { content: counter(plain); position: absolute; left: 0; top: 0.35rem; font-family: var(--hand); font-weight: 400; font-size: 1.5em; line-height: 1; color: var(--pencil); transform: rotate(-6deg); }
 
 /* ---------- Aufhänger: vorher / Team / nachher ---------- */
+/* ---------- Problem: die Kette ---------- */
+.chain-cols { display: grid; gap: 1.5rem; align-items: start; }
+.chain-col { position: relative; background: var(--sheet) url("/img/grain.webp"); border: 1px solid var(--line); padding: 1.4rem 1.4rem 1.2rem; box-shadow: var(--shadow); }
+.chain-today { transform: rotate(-0.6deg); }
+.chain-with { transform: rotate(0.8deg); }
+.chain-h { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 0.8rem; }
+.chain-steps { list-style: none; counter-reset: chain; margin: 0; padding: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em; }
+.chain-steps li { counter-increment: chain; position: relative; padding: 0.45rem 0 0.45rem 2.2rem; border-bottom: 1px solid var(--line); color: var(--muted); text-decoration: line-through; text-decoration-color: var(--pencil); text-decoration-thickness: 2px; }
+.chain-steps li::before { content: counter(chain); position: absolute; left: 0; top: 0.3rem; font-family: var(--hand); font-weight: 400; font-size: 1.5em; line-height: 1; color: var(--pencil); transform: rotate(-6deg); }
+.chain-note { margin-top: 0.9rem; }
+.chain-one { font-size: clamp(1.4rem, 2.8vw, 1.9rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin: 0 0 0.6rem; }
+.chain-done { font-size: 1.9rem; }
+@media (min-width: 48rem) { .chain-cols { grid-template-columns: 1.25fr 1fr; } .chain-with { margin-top: 3rem; } }
+
 .hook-grid { display: grid; gap: 2rem; align-items: start; }
 .hook-head { max-width: 46rem; }
 .hook-head h2 { margin-bottom: 0.35em; }
@@ -500,8 +517,10 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
   .hero-copy > :nth-child(3) { animation-delay: 0.2s; }
   .hero-copy > :nth-child(4) { animation-delay: 0.3s; }
   .hero-copy > :nth-child(5) { animation-delay: 0.4s; }
-  .hero h1 .circle path { animation: draw 0.9s 0.7s cubic-bezier(0.6, 0.1, 0.3, 1) both; }
-  .hero h1 .circle path:last-child { animation-delay: 1.45s; animation-duration: 0.6s; }
+  .hero-copy > :nth-child(6) { animation-delay: 0.5s; }
+  .hero-copy > :nth-child(7) { animation-delay: 0.6s; }
+  .hero .for-line .circle path { animation: draw 0.9s 0.7s cubic-bezier(0.6, 0.1, 0.3, 1) both; }
+  .hero .for-line .circle path:last-child { animation-delay: 1.45s; animation-duration: 0.6s; }
   .hero-note { animation: write 0.9s 1.7s linear both; }
   .board { animation: drop 0.8s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
   .mark-chair .circle path { animation: draw 0.9s 1.3s cubic-bezier(0.6, 0.1, 0.3, 1) both; }

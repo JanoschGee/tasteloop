@@ -4,7 +4,7 @@ A static page (HTML, CSS, a little vanilla JavaScript), hosted on **Vercel**. No
 
 | Path | What |
 |---|---|
-| `src/index.html` | the page: hero, the hook ("An AI made this image in seconds."), the flow in four steps (Messenger → Classification → Brand memory → Agents), the system diagram (one hand-drawn loop with five stations and the tool stack), teams, the one loud section, promise, the sign-up form |
+| `src/index.html` | the page: hero (for AI-first teams, pain first), the problem (five steps from screenshot to guide), what changes (before and after), the flow in four steps (Send → Understand → Approve → Use), the system diagram (one hand-drawn loop with five stations and the tool stack), teams, the one loud section, promise, the sign-up form |
 | `src/imprint.html`, `src/privacy.html` | legal pages |
 | `src/welcome.html` | where the confirmation link lands: the GitHub link and the setup prompt (`noindex`) |
 | `src/check-inbox.html`, `src/try-again.html` | answers for the form without JavaScript (`noindex`) |

@@ -18,17 +18,22 @@ afterAll(() => build());
 describe("Inhalt", () => {
   it("enthält die vereinbarten Aussagen", () => {
     for (const s of [
-      "Brand memory for",
-      "AI makes everything look the same. Your team's taste is the difference.",
-      "Drop references into your team chat and say why. Tasteloop turns them into rules your agents follow, and a person approves every change.",
-      "the more your team adds, the more on-brand every output gets.",
+      "Your taste moves on. Now your brand guide does too.",
+      "it dies in your camera roll.",
+      "With Tasteloop it goes from your phone into your brand guide and your next campaign, in one message.",
+      "what you see becomes your brand, and your brand shapes what your AI makes next.",
+      "Getting one screenshot into your brand takes five steps. So it never happens.",
+      "Send it to your team chat and say why.",
+      "Your AI stops guessing what you like.",
       "Taste can't be prompted.",
       "AI gets you 80% there. Your team knows the rest.",
       "An AI made this image in seconds.",
-      "Drop a photo into the team chat.",
+      "Send a screenshot to your team chat.",
       "Say why it matters.",
       "Anyone on the team can add to it.",
-      "Your agents get it.",
+      "Every AI you use knows your latest taste.",
+      "Your guide stays current. You just say yes.",
+      "Your whole team feeds it. You stay in control.",
       "3 people agree",
       "3 people, 5 references",
       "Stop the",
@@ -37,12 +42,13 @@ describe("Inhalt", () => {
       "Humans approve.",
       "Your taste stays yours.",
       "Get it free",
-      "How does your team keep AI output on-brand today?",
+      "How does inspiration get into your brand guide today?",
       "Send me occasional updates about Tasteloop.",
       "We'll email you the link. No spam.",
       "Hosted version for teams: later.",
     ]) expect(html, s).toContain(s);
-    expect(html).toMatch(/<h1 id="hero-title">Brand memory for <span class="circled">AI-first<svg[\s\S]*?<\/svg><\/span> teams\.<\/h1>/);
+    expect(html).toMatch(/<p class="for-line">The brand guide for <span class="circled">AI-first<svg[\s\S]*?<\/svg><\/span> teams<\/p>\s*<h1 id="hero-title">/);
+    expect(html).toContain("<title>Tasteloop · The brand guide for AI-first teams");
   });
   it("nennt weder die Lizenz noch den Namen eines Wettbewerbers", () => {
     expect(html).not.toMatch(/\bMIT\b|open source|open-source/i);
@@ -77,7 +83,7 @@ describe("Inhalt", () => {
     const flow = /<section id="how"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
     expect(flow).toMatch(/<p class="loop-back anim">\s*<a href="#step-messenger">/);
     expect(flow).toContain("next reference, next week.");
-    expect(flow).toMatch(/<li class="rail-loop"><a href="#step-messenger" aria-label="and back to step 01, Messenger">/);
+    expect(flow).toMatch(/<li class="rail-loop"><a href="#step-messenger" aria-label="and back to step 01, Send">/);
   });
   it("der Link zum Repo steht nur auf /welcome, nicht auf den öffentlichen Seiten", () => {
     expect(REPO_URL).toMatch(/^https:\/\/github\.com\/[\w-]+\/tasteloop$/);
@@ -98,9 +104,9 @@ describe("Inhalt", () => {
     expect(html).not.toMatch(/<ellipse|<circle |Gradient/);
     expect(read("styles.css")).not.toMatch(/gradient\(/i);
   });
-  it("erklärt den Ablauf in vier Schritten: Messenger, Classification, Brand memory, Agents", () => {
+  it("erklärt den Ablauf in vier Schritten: Send, Understand, Approve, Use", () => {
     const rail = /<nav class="rail"[\s\S]*?<\/nav>/.exec(html)?.[0] ?? "";
-    expect(rail.replace(/<svg[\s\S]*?<\/svg>|<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("01 Messenger 02 Classification 03 Brand memory 04 Agents");
+    expect(rail.replace(/<svg[\s\S]*?<\/svg>|<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("01 Send 02 Understand 03 Approve 04 Use");
     for (const id of ["step-messenger", "step-classification", "step-memory", "step-agents"]) {
       expect(html, id).toContain(`id="${id}"`);
       expect(html, id).toContain(`href="#${id}"`);
