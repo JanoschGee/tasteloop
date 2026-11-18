@@ -4,7 +4,7 @@ A static page (HTML, CSS, a little vanilla JavaScript), hosted on **Vercel**. No
 
 | Path | What |
 |---|---|
-| `src/index.html` | the page: hero, the hook ("An AI made this image in seconds."), the flow in four steps (Messenger → Classification → Brand memory → Agents), the system diagram with the tool stack, teams, the one loud section, promise, the sign-up form |
+| `src/index.html` | the page: hero, the hook ("An AI made this image in seconds."), the flow in four steps (Messenger → Classification → Brand memory → Agents), the system diagram (one hand-drawn loop with five stations and the tool stack), teams, the one loud section, promise, the sign-up form |
 | `src/imprint.html`, `src/privacy.html` | legal pages |
 | `src/welcome.html` | where the confirmation link lands: the GitHub link and the setup prompt (`noindex`) |
 | `src/check-inbox.html`, `src/try-again.html` | answers for the form without JavaScript (`noindex`) |
@@ -12,7 +12,7 @@ A static page (HTML, CSS, a little vanilla JavaScript), hosted on **Vercel**. No
 | `src/styles.css` | all styles and motion. The final state is the default state; hidden start states only apply under `.js` and without `prefers-reduced-motion` |
 | `src/app.js` | sets `.js`, marks `.anim` blocks as `.in` when they scroll into view, highlights the current step in the rail, sends the form with `fetch`, copy button |
 | `src/img/` | WebP images (generated in the brand style, then checked by hand), the paper grain tile and the marker underline |
-| `build.ts` | builds into `dist/`: inlines the logo, replaces `{{CIRCLE:seed:w:h[:mod]}}`, `{{UNDERLINE:seed:w}}` and `{{WAVE:seed:n}}`, copies images and fonts |
+| `build.ts` | builds into `dist/`: inlines the logo, replaces `{{CIRCLE:seed:w:h[:mod]}}`, `{{UNDERLINE:seed:w}}`, `{{LOOP:seed:w:h:inset}}` and `{{WAVE:seed:n}}`, copies images and fonts |
 | `vercel.json` | install and build commands, output directory, clean URLs, security headers (CSP, HSTS, Referrer-Policy, Permissions-Policy, X-Content-Type-Options, X-Frame-Options) |
 | `test/` | checks the built page and `vercel.json`: content, the four steps, named contributors, images (alt, dimensions, lazy loading, weight), CSP compatibility (no inline script or style), reduced motion, the form and its labels, the function (Brevo mocked), no GitHub link outside `/welcome`, no third-party resources, headers, draft guard |
 

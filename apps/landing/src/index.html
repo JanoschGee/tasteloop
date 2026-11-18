@@ -116,7 +116,7 @@
           <li>Say why it matters.</li>
           <li>Anyone on the team can add to it.</li>
         </ol>
-        <p class="section-lede">Tasteloop turns that into a brand guide your agents read. Four steps, one loop.</p>
+        <p class="section-lede">Tasteloop turns that into a brand guide your agents read. Four steps, then round again.</p>
       </header>
 
       <nav class="rail" aria-label="The four steps">
@@ -125,6 +125,7 @@
           <li><a href="#step-classification"><span class="rail-n">02</span> Classification{{CIRCLE:rail2:170:52}}</a></li>
           <li><a href="#step-memory"><span class="rail-n">03</span> Brand memory{{CIRCLE:rail3:170:52}}</a></li>
           <li><a href="#step-agents"><span class="rail-n">04</span> Agents{{CIRCLE:rail4:130:52}}</a></li>
+          <li class="rail-loop"><a href="#step-messenger" aria-label="and back to step 01, Messenger"><span aria-hidden="true">↺ 01</span>{{CIRCLE:rail5:80:52}}</a></li>
         </ol>
       </nav>
 
@@ -267,54 +268,63 @@
           </div>
         </li>
       </ol>
+      <p class="loop-back anim">
+        <a href="#step-messenger">
+          <svg class="arrow loop-back-arrow" viewBox="0 0 200 110" aria-hidden="true" focusable="false"><g filter="url(#rough)"><path class="bb" d="M-8 -8H208V118H-8Z"/><path pathLength="1" d="M186 20C196 66 150 98 96 96C52 94 18 70 20 22"/><path pathLength="1" d="M4 40C10 32 15 24 20 15C27 22 34 28 43 32"/></g></svg>
+          <span class="note write d2">next reference, next week.</span>
+          <span class="loop-back-t">Step 04 feeds step 01: what your agents make is what your team reacts to next. Back to Messenger.</span>
+        </a>
+      </p>
     </section>
 
     <section id="stack" class="stack" aria-labelledby="stack-title">
       <header class="section-head">
         <p class="kicker">What it runs on</p>
-        <h2 id="stack-title">The whole system on one page</h2>
-        <p class="section-lede">What you need to run it: five parts, mostly tools you already know. No new app for your team to learn.</p>
+        <h2 id="stack-title">The whole system is one loop</h2>
+        <p class="section-lede">What you need to run it: five stations, mostly tools you already know. What your agents make is what your team reacts to next.</p>
       </header>
       <div class="sys anim">
-        <div class="sys-flow">
-        <div class="sys-rail" aria-hidden="true"><i class="dot"></i><i class="dot dot2"></i><i class="dot dot3"></i></div>
-        <ol class="sys-nodes">
-          <li class="node pop d1">
-            <p class="node-k">Capture</p>
+        <div class="loop">
+          {{LOOP:loop10:900:560:80}}
+          {{LOOP:loop63:360:600:60}}
+          <div class="loop-center">
+            <span class="loop-mark" aria-hidden="true">{{LOGO}}</span>
+            <p>The more your team adds, the more on-brand every output gets.</p>
+          </div>
+          <ol class="stations">
+          <li class="st st-capture pop d1">
+            <p class="node-k"><span class="st-n">1</span> Capture</p>
             <h3>Your team chat</h3>
             <p class="badges"><span class="badge">Telegram</span><span class="badge">whisper.cpp</span></p>
-            <p class="node-p">Photos, captions, voice notes. Voice is transcribed locally, for free.</p>
+            <p class="node-p">Photos and voice notes. Voice is transcribed locally.</p>
           </li>
-          <li class="node pop d2">
-            <p class="node-k">Understand</p>
+          <li class="st st-understand pop d2">
+            <p class="node-k"><span class="st-n">2</span> Understand</p>
             <h3>Image + reason → note</h3>
             <p class="badges"><span class="badge">Claude API</span></p>
-            <p class="node-p">Claude reads the image together with the why. A few cents per upload.</p>
+            <p class="node-p">Claude reads the image with the why.</p>
           </li>
-          <li class="node pop d3">
-            <p class="node-k">Remember</p>
+          <li class="st st-remember pop d3">
+            <p class="node-k"><span class="st-n">3</span> Remember</p>
             <h3>Your vault</h3>
             <p class="badges"><span class="badge">Obsidian</span><span class="badge">Markdown</span></p>
-            <p class="node-p">Plain files you own: brand guide, references, briefs.</p>
+            <p class="node-p">Plain files: guide, references, briefs.</p>
           </li>
-          <li class="node pop d4">
-            <p class="node-k">Decide</p>
+          <li class="st st-decide pop d4">
+            <p class="node-k"><span class="st-n">4</span> Decide</p>
             <h3>A person approves</h3>
             <p class="badges"><span class="badge">Weekly digest</span></p>
-            <p class="node-p">Proposals with evidence and who backs them. The core stays locked.</p>
+            <p class="node-p">The core stays locked.</p>
           </li>
-          <li class="node pop d5">
-            <p class="node-k">Use</p>
+          <li class="st st-use pop d5">
+            <p class="node-k"><span class="st-n">5</span> Use</p>
             <h3>Agents read the files</h3>
             <p class="badges"><span class="badge">Claude Code</span><span class="badge">Claude</span><span class="badge">any agent</span></p>
-            <p class="node-p">No API, no plugin. Just the guide, the references and the briefs.</p>
+            <p class="node-p">Their output is the next thing your team reacts to.</p>
           </li>
-        </ol>
+          </ol>
         </div>
-        <div class="sys-back" aria-hidden="true">
-          <svg class="arrow sys-loop d6" viewBox="0 0 1000 60" preserveAspectRatio="none" focusable="false"><g filter="url(#rough)"><path class="bb" d="M-8 -8H1008V68H-8Z"/><path pathLength="1" d="M982 4C950 50 720 52 500 48C290 44 70 54 20 10"/><path pathLength="1" d="M8 30C11 22 15 15 19 8C26 13 33 16 42 17"/></g></svg>
-        </div>
-        <p class="note sys-note write d7">and round again: the more your team adds, the more on-brand it gets.</p>
+        <p class="note sys-note write d7">and round again. it never ends at step 5.</p>
         <div class="sys-base pop d7">
           <p><b>Runs on</b> your Mac or a small Linux server.</p>
           <p><b>Set up with</b> Claude Code. You say: <code>set up tasteloop</code></p>

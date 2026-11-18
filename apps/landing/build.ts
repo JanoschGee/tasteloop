@@ -50,6 +50,36 @@ export function underlineSvg(seed: string, w: number): string {
   return `<svg class="uline" viewBox="0 0 ${w} 14" preserveAspectRatio="none" aria-hidden="true" focusable="false"><g filter="url(#rough)"><path class="bb" d="M-6 -6H${w + 6}V20H-6Z"/><path pathLength="1" d="${d1}"/><path pathLength="1" d="${d2}"/></g></svg>`;
 }
 
+/**
+ * Die Schleife des Systembilds: ein großer, von Hand gezogener Kreis (im Uhrzeigersinn gespiegelt),
+ * dessen Ende mit einer Pfeilspitze wieder auf die erste Station zeigt. Drei Punkte laufen per SMIL
+ * (kein Skript, CSP-tauglich) genau eine Runde auf dem Strich; ohne Bewegung sind sie ausgeblendet.
+ */
+export const LOOP_OVERSHOOT = 0.03;
+export function loopSvg(seed: string, w: number, h: number, inset: number): string {
+  const s = seedOf(seed);
+  const main = pencilCircle(s, { width: w, height: h, inset, overshoot: LOOP_OVERSHOOT, wobble: 0.025 });
+  const second = pencilCircle(s + 7, { width: w, height: h, inset: inset + 7, overshoot: 0.05, wobble: 0.03 });
+  const f = (n: number) => n.toFixed(1);
+  const pts = main.points;
+  const [ex, ey] = pts[pts.length - 1];
+  const [px, py] = pts[pts.length - 2];
+  const dir = Math.atan2(ey - py, ex - px);
+  const len = Math.max(16, Math.min(w, h) * 0.045);
+  const wing = (a: number) => `${f(ex - Math.cos(dir + a) * len)} ${f(ey - Math.sin(dir + a) * len)}`;
+  const head = `M${wing(0.5)} L${f(ex)} ${f(ey)} L${wing(-0.5)}`;
+  const id = `loop-${w}x${h}`;
+  const mirror = `translate(${w} 0) scale(-1 1)`;
+  const end = (1 / (1 + LOOP_OVERSHOOT)).toFixed(3);
+  const dot = (begin: string) =>
+    `<path class="ldot" d="M-6 0a6 6 0 1 0 12 0a6 6 0 1 0 -12 0"><animateMotion dur="12s" begin="${begin}" repeatCount="indefinite" calcMode="linear" keyTimes="0;1" keyPoints="0;${end}"><mpath href="#${id}"/></animateMotion></path>`;
+  return (
+    `<svg class="arrow loop-ring loop-ring--${w > h ? "wide" : "tall"}" viewBox="0 0 ${w} ${h}" aria-hidden="true" focusable="false">` +
+    `<g transform="${mirror}" filter="url(#rough)"><path class="bb" d="M-10 -10H${w + 10}V${h + 10}H-10Z"/><path class="r2" pathLength="1" d="${second.d}"/><path id="${id}" class="r1" pathLength="1" d="${main.d}"/><path class="rh" pathLength="1" d="${head}"/></g>` +
+    `<g transform="${mirror}">${dot("0s")}${dot("-4s")}${dot("-8s")}</g></svg>`
+  );
+}
+
 /** Wellenform einer Sprachnotiz als ein Pfad aus senkrechten Strichen. */
 export function waveSvg(seed: string, bars: number): string {
   const r = rng(seedOf(seed));
@@ -94,6 +124,7 @@ export function render(html: string, opts: BuildOptions = {}): string {
     .replace(/\{\{ANALYTICS\}\}/g, analyticsTag(opts.analytics))
     .replace(/\{\{CIRCLE:([\w-]+):(\d+):(\d+)(?::([a-z]+))?\}\}/g, (_m, seed: string, w: string, h: string, mod?: string) => circleSvg(seed, Number(w), Number(h), mod))
     .replace(/\{\{UNDERLINE:([\w-]+):(\d+)\}\}/g, (_m, seed: string, w: string) => underlineSvg(seed, Number(w)))
+    .replace(/\{\{LOOP:([\w-]+):(\d+):(\d+):(\d+)\}\}/g, (_m, seed: string, w: string, h: string, inset: string) => loopSvg(seed, Number(w), Number(h), Number(inset)))
     .replace(/\{\{WAVE:([\w-]+):(\d+)\}\}/g, (_m, seed: string, n: string) => waveSvg(seed, Number(n)));
   const left = /\{\{[A-Z_:\w-]+\}\}/.exec(out);
   if (left) throw new Error(`Placeholder not replaced: ${left[0]}`);

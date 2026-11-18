@@ -136,7 +136,7 @@ main > section { padding-top: clamp(3.5rem, 9vw, 7rem); padding-bottom: 1rem; }
 
 /* ---------- Ablauf ---------- */
 .rail { position: sticky; top: 0; z-index: 5; margin: 0 -1.25rem 1rem; padding: 0.55rem 1.25rem; background: var(--paper) url("/img/grain.webp"); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
-.rail ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; gap: 0.25rem; }
+.rail ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, auto); justify-content: space-between; gap: 0.25rem; }
 .rail li { display: flex; align-items: center; }
 .rail li + li::before { content: "→"; font-family: var(--hand); font-size: 1.6rem; line-height: 1; color: var(--pencil); margin-right: clamp(0.25rem, 2.5vw, 2rem); }
 .rail a { position: relative; display: inline-block; padding: 0.5rem 0.4rem; font-weight: 700; font-size: 1rem; text-decoration: none; white-space: nowrap; color: var(--muted); transition: color 0.3s ease; }
@@ -358,26 +358,44 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
 .voices-h { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
 .voices-note { font-size: 0.95rem; color: #262626; margin: 0.4rem 0 0; max-width: 30ch; }
 
-/* ---------- Systembild: was man braucht ---------- */
-.sys-flow { position: relative; }
-.sys-rail { position: absolute; left: 0.55rem; top: 0.5rem; bottom: 2rem; width: 2px; background: var(--ink); }
-.dot { position: absolute; left: -4px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--pencil); opacity: 0; }
-.sys-nodes { list-style: none; margin: 0; padding: 0 0 0 2.2rem; display: grid; gap: 1.1rem; }
-.node { position: relative; background: var(--sheet) url("/img/grain.webp"); border: 1px solid var(--line); padding: 1rem 1.1rem 1.1rem; box-shadow: var(--shadow); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease; }
-.node::before { content: ""; position: absolute; left: -1.65rem; top: 1.45rem; width: 1.65rem; height: 2px; background: var(--ink); }
-.node::after { content: ""; position: absolute; left: -2rem; top: 1.1rem; width: 0.75rem; height: 0.75rem; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); }
-.node:hover { transform: translateY(-5px) rotate(-0.6deg); box-shadow: var(--shadow-up); }
-.node:nth-child(even):hover { transform: translateY(-5px) rotate(0.6deg); }
-.node-k { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pencil); margin: 0 0 0.45rem; }
-.node h3 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.6rem; }
-.badges { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0 0 0.65rem; }
-.badge { font: 0.74rem/1.2 var(--mono); border: 1.5px solid var(--ink); border-radius: 0.3rem; padding: 0.18rem 0.42rem; background: #fff; white-space: nowrap; }
-.node-p { font-size: 0.88rem; line-height: 1.45; margin: 0; color: #262626; }
-.sys-back { display: none; }
-.sys-note { display: block; margin: 1.3rem 0 0 2.2rem; font-size: 1.6rem; max-width: 22ch; }
+/* ---------- Systembild: eine Schleife, keine Linie ---------- */
+.loop { position: relative; width: 100%; max-width: 24rem; margin: 0 auto; aspect-ratio: 360 / 600; }
+.loop-ring { left: 0; top: 0; width: 100%; height: 100%; }
+.loop-ring--wide { display: none; }
+.loop-ring path { stroke-width: 2.6; }
+.loop-ring path.r2 { stroke-width: 1.4; stroke-opacity: 0.4; }
+.loop-ring path.rh, .loop-ring path.r1 { stroke-width: 2.6; stroke-opacity: 1; }
+.loop-ring path.ldot { fill: var(--pencil); stroke: none; display: none; }
+.loop-center { position: absolute; left: 50%; top: 60%; width: 52%; transform: translate(-50%, -50%); text-align: center; }
+.loop-mark svg { display: block; width: 62%; height: auto; margin: 0 auto 0.3rem; overflow: visible; }
+.loop-center p { margin: 0; font-weight: 800; font-size: 0.98rem; line-height: 1.2; letter-spacing: -0.02em; text-wrap: balance; }
+.stations { list-style: none; margin: 0; padding: 0; }
+.st { position: absolute; width: 36%; translate: -50% -50%; background: var(--sheet) url("/img/grain.webp"); border: 1.5px solid var(--ink); padding: 0.5rem 0.55rem 0.55rem; box-shadow: var(--shadow); transition: box-shadow 0.3s ease, rotate 0.3s ease, scale 0.3s ease; }
+.st:hover { box-shadow: var(--shadow-up); rotate: -1.5deg; scale: 1.04; z-index: 2; }
+.st-capture { left: 50%; top: 10%; }
+.st-understand { left: 81.7%; top: 37.6%; }
+.st-remember { left: 69.6%; top: 82.4%; }
+.st-decide { left: 30.4%; top: 82.4%; }
+.st-use { left: 18.3%; top: 37.6%; }
+.node-k { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--pencil); margin: 0 0 0.35rem; white-space: nowrap; }
+.st-n { display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: var(--pencil); color: #fff; font-size: 0.7rem; letter-spacing: 0; margin-right: 0.15rem; }
+.st h3, .st .node-p { display: none; }
+.badges { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0; }
+.badge { font: 0.68rem/1.2 var(--mono); border: 1.5px solid var(--ink); border-radius: 0.3rem; padding: 0.14rem 0.34rem; background: #fff; white-space: nowrap; }
+.sys-note { display: block; margin: 1.2rem 0 0; font-size: 1.6rem; text-align: center; }
 .sys-base { margin-top: 1.4rem; border: 2px solid var(--ink); background: var(--sheet) url("/img/grain.webp"); padding: 0.9rem 1.1rem; display: grid; gap: 0.3rem 2.5rem; font-size: 0.98rem; }
 .sys-base p { margin: 0; }
 .sys-base code { font: 0.88rem/1.3 var(--mono); border: 1.5px solid var(--ink); background: #fff; padding: 0.12rem 0.4rem; white-space: nowrap; }
+
+/* Rücksprung am Ende der vier Schritte */
+.rail-loop a { font-family: var(--hand); font-weight: 400; font-size: 1.45rem; line-height: 1; color: var(--pencil); padding-top: 0.2rem; padding-bottom: 0.2rem; }
+.rail .rail-loop a:hover { color: var(--pencil); }
+.loop-back { margin: 0.5rem 0 0; }
+.loop-back a { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 1.2rem; align-items: center; text-decoration: none; max-width: 40rem; }
+.loop-back-arrow { position: static; grid-row: 1 / span 2; width: 6.5rem; height: 3.6rem; }
+.loop-back .note { font-size: 1.9rem; justify-self: start; }
+.loop-back-t { font-size: 0.92rem; color: #262626; }
+.loop-back a:hover .loop-back-t { text-decoration: underline; text-decoration-color: var(--pencil); text-underline-offset: 4px; }
 
 /* ---------- Formular (Anmeldung) ---------- */
 .gate { max-width: 34rem; margin-top: 1.6rem; }
@@ -418,14 +436,22 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
   .wall { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
   .hook-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1fr); gap: 2.5rem 3rem; }
   .hook-head { grid-column: 1 / -1; }
-  .sys-rail { left: 0; right: 0; top: 0.55rem; bottom: auto; width: auto; height: 2px; }
-  .dot { left: 0; top: -4px; }
-  .sys-nodes { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; padding: 2.2rem 0 0; }
-  .node::before { left: 1.45rem; top: -1.65rem; width: 2px; height: 1.65rem; }
-  .node::after { left: 1.1rem; top: -2rem; }
-  .sys-back { display: block; position: relative; height: 3.6rem; margin: 0.6rem 2% 0; }
-  .sys-loop { left: 0; top: 0; width: 100%; height: 100%; }
-  .sys-note { margin: 0.2rem 0 0; text-align: center; max-width: none; }
+  .loop { max-width: 64rem; aspect-ratio: 900 / 560; }
+  .loop-ring--wide { display: block; }
+  .loop-ring--tall { display: none; }
+  .loop-center { top: 50%; width: 34%; }
+  .loop-mark svg { width: 46%; margin-bottom: 0.6rem; }
+  .loop-center p { font-size: 1.35rem; }
+  .st { width: 20%; padding: 0.75rem 0.85rem 0.8rem; }
+  .st h3 { display: block; font-size: 1.05rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.45rem; }
+  .st .node-p { display: block; font-size: 0.8rem; line-height: 1.35; margin: 0.45rem 0 0; color: #262626; }
+  .st-capture { top: 14.3%; }
+  .st-understand { left: 89.1%; top: 38.9%; }
+  .st-remember { left: 74.2%; top: 78.9%; }
+  .st-decide { left: 25.8%; top: 78.9%; }
+  .st-use { left: 10.9%; top: 38.9%; }
+  .node-k { font-size: 0.78rem; }
+  .badge { font-size: 0.72rem; }
   .sys-base { grid-template-columns: auto auto; justify-content: space-between; margin-top: 1.6rem; }
   .voices { padding-top: 1.5rem; }
 }
@@ -433,7 +459,8 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
   .top nav { gap: 0.25rem 1rem; font-size: 0.9rem; }
   .brand svg { height: 2.6rem; }
   .rail { padding-left: 0.5rem; padding-right: 0.5rem; }
-  .rail ol { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+  .rail ol { grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: 0; }
+  .rail .rail-loop a { font-size: 1.1rem; white-space: nowrap; }
   .rail li { justify-content: center; }
   .rail li + li::before { display: none; }
   .rail a { font-size: 0.74rem; padding: 0.45rem 0.15rem; text-align: center; white-space: normal; line-height: 1.15; }
@@ -462,8 +489,6 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes scan { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 0.9; } 85% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(15rem); } }
 @keyframes drift { from { transform: rotate(1.6deg); } to { transform: rotate(-1.2deg) translateY(-28px); } }
-@keyframes flowx { 0% { left: 0; opacity: 0; } 6% { opacity: 1; } 94% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-@keyframes flowy { 0% { top: 0; opacity: 0; } 6% { opacity: 1; } 94% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
 @keyframes slam { from { transform: rotate(-9deg) scale(0.82); } to { transform: rotate(-2.5deg) scale(1); } }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -497,11 +522,11 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
     .mark-note-yes { animation: write 0.4s 5.3s linear both; }
   }
 
-  /* Systembild: Punkte laufen die Schiene entlang, solange der Block sichtbar war */
-  .js .sys.in .dot { animation: flowy 6s linear infinite; }
-  .js .sys.in .dot2 { animation-delay: 2s; }
-  .js .sys.in .dot3 { animation-delay: 4s; }
-  @media (min-width: 58rem) { .js .sys.in .dot { animation-name: flowx; } }
+  /* Systembild: die Punkte laufen nur, wenn Bewegung erwünscht ist (SMIL im SVG, hier nur ein-/ausgeblendet) */
+  .loop-ring path.ldot { display: inline; }
+  .js .anim:not(.in) .ldot { opacity: 0; }
+  .js .anim .ldot { transition: opacity 0.6s ease 1.6s; }
+  .js .anim .loop-ring path.rh { transition-delay: 0.9s; transition-duration: 0.3s; }
 
   /* Hover-Kreise */
   .button .circle path, .rail .circle path { transition: stroke-dashoffset 0.5s cubic-bezier(0.6, 0.1, 0.3, 1); }

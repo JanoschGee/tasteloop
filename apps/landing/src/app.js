@@ -20,7 +20,7 @@
 
   // 2) Schrittleiste: der Schritt in der Bildmitte wird eingekreist
   var links = {};
-  Array.prototype.forEach.call(document.querySelectorAll(".rail a"), function (a) {
+  Array.prototype.forEach.call(document.querySelectorAll(".rail li:not(.rail-loop) a"), function (a) {
     links[a.getAttribute("href").slice(1)] = a;
   });
   if ("IntersectionObserver" in window) {

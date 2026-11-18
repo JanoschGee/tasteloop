@@ -48,14 +48,36 @@ describe("Inhalt", () => {
     expect(html).not.toMatch(/\bMIT\b|open source|open-source/i);
     expect(html).not.toMatch(/brand\s?os\b/i);
   });
-  it("Systembild: fünf Teile mit den Werkzeugen, die man braucht", () => {
+  it("Systembild: eine Schleife mit fünf Stationen und den Werkzeugen, keine Linie", () => {
     const sys = /<section id="stack"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
-    for (const k of ["Capture", "Understand", "Remember", "Decide", "Use"]) expect(sys, k).toContain(`<p class="node-k">${k}</p>`);
-    for (const b of ["Telegram", "whisper.cpp", "Claude API", "Obsidian", "Markdown", "Weekly digest", "Claude Code", "any agent"]) expect(sys, b).toContain(`<span class="badge">${b}</span>`);
-    for (const t of ["your Mac or a small Linux server", "<code>set up tasteloop</code>", "The core stays locked."]) expect(sys, t).toContain(t);
+    const order = ["Capture", "Understand", "Remember", "Decide", "Use"];
+    const found = [...sys.matchAll(/<p class="node-k"><span class="st-n">(\d)<\/span> (\w+)<\/p>/g)].map((m) => `${m[1]} ${m[2]}`);
+    expect(found).toEqual(order.map((k, i) => `${i + 1} ${k}`));
+    for (const b of ["Telegram", "whisper.cpp", "Claude API", "Obsidian", "Markdown", "Weekly digest", "Claude Code", "Claude", "any agent"]) expect(sys, b).toContain(`<span class="badge">${b}</span>`);
+    for (const t of ["your Mac or a small Linux server", "<code>set up tasteloop</code>", "The core stays locked.", "The more your team adds, the more on-brand every output gets."]) expect(sys, t).toContain(t);
     expect(sys).not.toMatch(/<img\b/);
-    expect(sys).toContain('class="dot"');
-    expect(read("styles.css")).toMatch(/\.js \.sys\.in \.dot \{ animation: flowy/);
+    // zwei handgezogene Ringe (quer für Desktop, hoch für Mobil), je mit Pfeilspitze und drei laufenden Punkten
+    const rings = sys.match(/<svg class="arrow loop-ring loop-ring--(wide|tall)"[\s\S]*?<\/svg>/g) ?? [];
+    expect(rings.length).toBe(2);
+    for (const ring of rings) {
+      expect(ring).toMatch(/<path id="loop-\d+x\d+" class="r1" pathLength="1" d="M[\d. -]+ C/);
+      expect(ring).toContain('class="rh"');
+      expect((ring.match(/<animateMotion /g) ?? []).length).toBe(3);
+      expect((ring.match(/ C/g) ?? []).length).toBeGreaterThan(40);
+    }
+    expect(sys).not.toMatch(/sys-rail|sys-nodes/);
+    const css = read("styles.css");
+    // ohne Bewegung: Punkte aus, Stationen sichtbar (Punkte erscheinen nur im no-preference-Block)
+    const [base, motion] = css.split("@media (prefers-reduced-motion: no-preference)");
+    expect(base).toMatch(/\.loop-ring path\.ldot \{[^}]*display: none;/);
+    expect(motion).toMatch(/\.loop-ring path\.ldot \{ display: inline; \}/);
+    for (const c of ["st-capture", "st-understand", "st-remember", "st-decide", "st-use"]) expect(css, c).toMatch(new RegExp(`\\.${c} \\{ left: [\\d.]+%; top: [\\d.]+%; \\}`));
+  });
+  it("die vier Schritte enden nicht in einer Sackgasse: sichtbarer Rücksprung von Agents zu Messenger", () => {
+    const flow = /<section id="how"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
+    expect(flow).toMatch(/<p class="loop-back anim">\s*<a href="#step-messenger">/);
+    expect(flow).toContain("next reference, next week.");
+    expect(flow).toMatch(/<li class="rail-loop"><a href="#step-messenger" aria-label="and back to step 01, Messenger">/);
   });
   it("der Link zum Repo steht nur auf /welcome, nicht auf den öffentlichen Seiten", () => {
     expect(REPO_URL).toMatch(/^https:\/\/github\.com\/[\w-]+\/tasteloop$/);
@@ -190,6 +212,17 @@ describe("Bilder, Bewegung und CSP", () => {
     expect(css).toMatch(/@supports \(animation-timeline: view\(\)\)/);
     expect(read("app.js")).toContain("prefers-reduced-motion: reduce");
     expect(read("app.js")).toContain("IntersectionObserver");
+  });
+  it("das Stylesheet ist wohlgeformt (Klammern ausgeglichen, keine verirrte schließende Klammer)", () => {
+    let depth = 0;
+    let min = 0;
+    for (const ch of read("styles.css").replace(/\/\*[\s\S]*?\*\//g, "").replace(/"[^"]*"/g, "")) {
+      if (ch === "{") depth++;
+      if (ch === "}") depth--;
+      min = Math.min(min, depth);
+    }
+    expect(min).toBe(0);
+    expect(depth).toBe(0);
   });
   it("Schriften kommen von der eigenen Seite", () => {
     for (const f of ["fonts/caveat-latin-400-normal.woff2", "fonts/inter-tight-latin-wght-normal.woff2", "fonts/inter-tight-LICENSE.txt"]) expect(existsSync(join(dist, f)), f).toBe(true);
