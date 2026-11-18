@@ -584,3 +584,23 @@ mark.todo { background: none; color: var(--pencil); font-weight: 700; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Schleife im Hero: fast rund (520 × 560, Abstand 60), Stationen alle 72° ab oben ---------- */
+.loop.loop--hero { max-width: 22rem; aspect-ratio: 520 / 560; margin-top: 1rem; margin-bottom: 2.5rem; }
+.loop--hero .loop-ring--tall, .loop--hero .loop-ring--wide { display: block; }
+.loop--hero .loop-center { top: 50%; width: 46%; }
+.loop--hero .loop-mark svg { width: 70%; margin-bottom: 0.3rem; }
+.loop--hero .loop-center p { font-size: 0.95rem; }
+.loop--hero .st { width: 34%; padding: 0.4rem 0.4rem 0.45rem; }
+.loop--hero .node-k { font-size: 0.62rem; letter-spacing: 0.03em; white-space: nowrap; }
+.loop--hero .st-capture { left: 50%; top: 10.7%; }
+.loop--hero .st-understand { left: 86.6%; top: 37.9%; }
+.loop--hero .st-remember { left: 72.6%; top: 81.8%; }
+.loop--hero .st-decide { left: 27.4%; top: 81.8%; }
+.loop--hero .st-use { left: 13.4%; top: 37.9%; }
+@media (min-width: 58rem) {
+  .loop.loop--hero { max-width: 31rem; margin-top: 0; }
+  .loop--hero .loop-center p { font-size: 1.2rem; }
+  .loop--hero .st { width: 30%; padding: 0.55rem 0.6rem 0.6rem; }
+  .loop--hero .node-k { font-size: 0.74rem; letter-spacing: 0.06em; }
+}

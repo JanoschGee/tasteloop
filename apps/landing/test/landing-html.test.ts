@@ -18,72 +18,61 @@ afterAll(() => build());
 describe("Inhalt", () => {
   it("enthält die vereinbarten Aussagen", () => {
     for (const s of [
-      "Your taste moves on. Now your brand guide does too.",
-      "it dies in your camera roll.",
-      "With Tasteloop it goes from your phone into your brand guide and your next campaign, in one message.",
-      "what you see becomes your brand, and your brand shapes what your AI makes next.",
+      "Screenshot it. Say why. Your brand learns.",
+      "Style guides can't show your visuals. Screenshots can.",
+      "Send visual inspiration from your phone with one line of why. No time blocked for it.",
+      "the core of your brand stays locked.",
       "Getting one screenshot into your brand takes five steps. So it never happens.",
       "Send it to your team chat and say why.",
       "Your AI stops guessing what you like.",
-      "Taste can't be prompted.",
-      "AI gets you 80% there. Your team knows the rest.",
-      "An AI made this image in seconds.",
-      "Send a screenshot to your team chat.",
-      "Say why it matters.",
-      "Anyone on the team can add to it.",
-      "Every AI you use knows your latest taste.",
-      "Your guide stays current. You just say yes.",
-      "Your whole team feeds it. You stay in control.",
+      "Screenshot it, say why.",
+      "The reason is kept, not just the picture.",
+      "You approve. The core stays locked.",
+      "Every AI you use reads it.",
       "3 people agree",
       "3 people, 5 references",
-      "Stop the",
-      "Everyone adds.",
-      "Disagreements surface.",
-      "Humans approve.",
-      "Your taste stays yours.",
+      "Taste can't be prompted.",
       "Get it free",
+      "set up in about an hour with Claude Code",
       "How does inspiration get into your brand guide today?",
       "Send me occasional updates about Tasteloop.",
       "We'll email you the link. No spam.",
       "Hosted version for teams: later.",
     ]) expect(html, s).toContain(s);
     expect(html).toMatch(/<p class="for-line">The brand guide for <span class="circled">AI-first<svg[\s\S]*?<\/svg><\/span> teams<\/p>\s*<h1 id="hero-title">/);
-    expect(html).toContain("<title>Tasteloop · The brand guide for AI-first teams");
+    expect(html).toContain("<title>Tasteloop · Screenshot it. Say why. Your brand learns.</title>");
   });
   it("nennt weder die Lizenz noch den Namen eines Wettbewerbers", () => {
     expect(html).not.toMatch(/\bMIT\b|open source|open-source/i);
     expect(html).not.toMatch(/brand\s?os\b/i);
   });
-  it("Systembild: eine Schleife mit fünf Stationen und den Werkzeugen, keine Linie", () => {
-    const sys = /<section id="stack"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
-    const order = ["Capture", "Understand", "Remember", "Decide", "Use"];
-    const found = [...sys.matchAll(/<p class="node-k"><span class="st-n">(\d)<\/span> (\w+)<\/p>/g)].map((m) => `${m[1]} ${m[2]}`);
-    expect(found).toEqual(order.map((k, i) => `${i + 1} ${k}`));
-    for (const b of ["Telegram", "whisper.cpp", "Claude API", "Obsidian", "Markdown", "Weekly digest", "Claude Code", "Claude", "any agent"]) expect(sys, b).toContain(`<span class="badge">${b}</span>`);
-    for (const t of ["your Mac or a small Linux server", "<code>set up tasteloop</code>", "The core stays locked.", "The more your team adds, the more on-brand every output gets."]) expect(sys, t).toContain(t);
-    expect(sys).not.toMatch(/<img\b/);
-    // zwei handgezogene Ringe (quer für Desktop, hoch für Mobil), je mit Pfeilspitze und drei laufenden Punkten
-    const rings = sys.match(/<svg class="arrow loop-ring loop-ring--(wide|tall)"[\s\S]*?<\/svg>/g) ?? [];
-    expect(rings.length).toBe(2);
-    for (const ring of rings) {
-      expect(ring).toMatch(/<path id="loop-\d+x\d+" class="r1" pathLength="1" d="M[\d. -]+ C/);
-      expect(ring).toContain('class="rh"');
-      expect((ring.match(/<animateMotion /g) ?? []).length).toBe(3);
-      expect((ring.match(/ C/g) ?? []).length).toBeGreaterThan(40);
-    }
-    expect(sys).not.toMatch(/sys-rail|sys-nodes/);
+  it("Hero: der Kreis mit fünf Stationen läuft, keine Linie und kein eigener Stack-Abschnitt mehr", () => {
+    const hero = /<section class="hero"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
+    const found = [...hero.matchAll(/<p class="node-k"><span class="st-n">(\d)<\/span> (\w+)<\/p>/g)].map((m) => `${m[1]} ${m[2]}`);
+    expect(found).toEqual(["Capture", "Understand", "Remember", "Decide", "Use"].map((k, i) => `${i + 1} ${k}`));
+    expect(hero).toContain('<div class="loop loop--hero anim" role="img" aria-label="Tasteloop as one loop with five stations');
+    expect(hero).toContain("Core locked. The rest learns.");
+    const rings = hero.match(/<svg class="arrow loop-ring loop-ring--tall"[\s\S]*?<\/svg>/g) ?? [];
+    expect(rings.length).toBe(1);
+    expect(rings[0]).toMatch(/viewBox="0 0 520 560"/);
+    expect(rings[0]).toContain('class="rh"');
+    expect((rings[0].match(/<animateMotion /g) ?? []).length).toBe(3);
+    expect(hero).not.toMatch(/<img\b/);
+    expect(html).not.toMatch(/id="stack"|class="rail"|loop-back/);
     const css = read("styles.css");
-    // ohne Bewegung: Punkte aus, Stationen sichtbar (Punkte erscheinen nur im no-preference-Block)
     const [base, motion] = css.split("@media (prefers-reduced-motion: no-preference)");
     expect(base).toMatch(/\.loop-ring path\.ldot \{[^}]*display: none;/);
     expect(motion).toMatch(/\.loop-ring path\.ldot \{ display: inline; \}/);
-    for (const c of ["st-capture", "st-understand", "st-remember", "st-decide", "st-use"]) expect(css, c).toMatch(new RegExp(`\\.${c} \\{ left: [\\d.]+%; top: [\\d.]+%; \\}`));
+    for (const c of ["st-capture", "st-understand", "st-remember", "st-decide", "st-use"]) expect(css, c).toMatch(new RegExp(`\\.loop--hero \\.${c} \\{ left: [\\d.]+%; top: [\\d.]+%; \\}`));
   });
-  it("die vier Schritte enden nicht in einer Sackgasse: sichtbarer Rücksprung von Agents zu Messenger", () => {
-    const flow = /<section id="how"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
-    expect(flow).toMatch(/<p class="loop-back anim">\s*<a href="#step-messenger">/);
-    expect(flow).toContain("next reference, next week.");
-    expect(flow).toMatch(/<li class="rail-loop"><a href="#step-messenger" aria-label="and back to step 01, Send">/);
+  it("wenig Text: sichtbare Wörter ohne Formular und Mockups bleiben knapp", () => {
+    const main = /<main[\s\S]*?<\/main>/.exec(html)?.[0] ?? "";
+    const prose = main
+      .replace(/<form[\s\S]*?<\/form>/, " ")
+      .replace(/<div class="stage anim">[\s\S]*?\n {10}<\/div>\n {8}<\/li>/g, " ")
+      .replace(/<svg[\s\S]*?<\/svg>/g, " ")
+      .replace(/<[^>]+>/g, " ");
+    expect(prose.split(/\s+/).filter(Boolean).length).toBeLessThan(400);
   });
   it("der Link zum Repo steht nur auf /welcome, nicht auf den öffentlichen Seiten", () => {
     expect(REPO_URL).toMatch(/^https:\/\/github\.com\/[\w-]+\/tasteloop$/);
@@ -105,23 +94,20 @@ describe("Inhalt", () => {
     expect(read("styles.css")).not.toMatch(/gradient\(/i);
   });
   it("erklärt den Ablauf in vier Schritten: Send, Understand, Approve, Use", () => {
-    const rail = /<nav class="rail"[\s\S]*?<\/nav>/.exec(html)?.[0] ?? "";
-    expect(rail.replace(/<svg[\s\S]*?<\/svg>|<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("01 Send 02 Understand 03 Approve 04 Use");
-    for (const id of ["step-messenger", "step-classification", "step-memory", "step-agents"]) {
-      expect(html, id).toContain(`id="${id}"`);
-      expect(html, id).toContain(`href="#${id}"`);
-    }
+    const steps = [...html.matchAll(/<p class="step-n">(\d\d) · (\w+)<\/p>/g)].map((m) => `${m[1]} ${m[2]}`);
+    expect(steps).toEqual(["01 Send", "02 Understand", "03 Approve", "04 Use"]);
+    for (const id of ["step-messenger", "step-classification", "step-memory", "step-agents"]) expect(html, id).toContain(`id="${id}"`);
     for (const s of [">Brand<", ">Campaign<", ">Just keep<", "locked", "learns", "Approved", "Brand/Brand Guide.md"]) expect(html, s).toContain(s);
   });
   it("mehrere Beitragende sind mit Namen sichtbar, nicht nur über Stiftfarben", () => {
     for (const n of ["Alex", "Kim", "Sam"]) expect(html).toMatch(new RegExp(`class="by">${n}`));
-    expect(html).toContain("disagrees");
+    expect(html).toContain("Disagreements wait for a person.");
   });
   it("behauptet keine Kunden, Zahlen oder eine gehostete Version", () => {
     expect(html).not.toMatch(/trusted by|customers|testimonial|\d+\s?(x|%) (faster|better|more)|sign up|pricing/i);
   });
-  it("Gelb gibt es nur in der einen lauten Sektion", () => {
-    expect((html.match(/class="loud"/g) ?? []).length).toBe(1);
+  it("Gelb gibt es höchstens in einer lauten Sektion", () => {
+    expect((html.match(/class="loud"/g) ?? []).length).toBeLessThanOrEqual(1);
     const css = read("styles.css");
     const uses = css.split("\n").filter((l) => /var\(--marker\)|#ffe500/i.test(l) && !/^\s*--marker:/.test(l));
     expect(uses.length).toBeGreaterThan(0);
@@ -169,7 +155,7 @@ describe("Anmeldeformular", () => {
 describe("Bilder, Bewegung und CSP", () => {
   it("jedes Bild hat alt, Breite und Höhe, liegt lokal als WebP vor; unter dem Falz wird nachgeladen", () => {
     const imgs = html.match(/<img\b[^>]*>/g) ?? [];
-    expect(imgs.length).toBeGreaterThanOrEqual(6);
+    expect(imgs.length).toBeGreaterThanOrEqual(4);
     for (const tag of imgs) {
       expect(tag, tag).toMatch(/\salt="[^"]*"/);
       expect(tag, tag).toMatch(/\swidth="\d+"/);
@@ -180,8 +166,7 @@ describe("Bilder, Bewegung und CSP", () => {
       if (!tag.includes("hero-desk")) expect(tag, tag).toContain('loading="lazy"');
     }
     // inhaltliche Bilder (nicht in einer role="img"-Illustration) brauchen einen echten Alt-Text
-    expect(imgs.filter((t) => /\salt="[^"]{20,}"/.test(t)).length).toBeGreaterThanOrEqual(6);
-    expect(html).toMatch(/hero-desk\.webp"[^>]*fetchpriority="high"/);
+    expect(imgs.filter((t) => /\salt="[^"]{20,}"/.test(t)).length).toBeGreaterThanOrEqual(2);
   });
   it("Seitengewicht bleibt im Rahmen (Hero ≤ 200 kB, alles zusammen < 1,5 MB)", () => {
     const size = (dir: string): number =>
